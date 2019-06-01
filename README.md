@@ -1,2 +1,2 @@
 # Polar Rover
-Software navigation and hardware specifications for University of Washington polar rover.
+Software navigation and hardware specifications for UW Glaciology polar rover.
