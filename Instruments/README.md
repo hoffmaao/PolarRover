@@ -8,5 +8,4 @@ The instrument subsystem includes all instruments both custom made and purchased
 
 ## SLR cameras
 
-## Near surface meterologic sensors
 
