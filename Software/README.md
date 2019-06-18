@@ -6,4 +6,4 @@ The software subsystem includes all necessary software for driving the rover and
 
 ## Control method
 
-For serial control (non-autonomous), we use a wireless xbox controller. Eventually, I'd like to integrate cellular communication with compatability for both OS and Android.
+For serial control (non-autonomous), we use a wireless xbox controller. Eventually, we will integrate cellular communication with compatability for both OS and Android.
