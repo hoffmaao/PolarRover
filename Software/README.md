@@ -2,7 +2,7 @@
 
 The software subsystem includes all necessary software for driving the rover and triggering instruments for data collection.
 
-## Raspberry Pi 3
+## JETSON NANO
 
 ## Control method
 
