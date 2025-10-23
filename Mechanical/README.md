@@ -1,4 +1,4 @@
-# Mechanical Subsystem
+# Mechanical Subsystems
 
 The machnical subsystem of the rover comprises all the material hardwear without any of the electronics. The  mechanical body of the rover relies on drive systems developed by MTT134.
 
