@@ -1,18 +1,18 @@
 # PolarRover
 
-PolarRover is the software and hardware specification for two autonomous rovers built at LDEO for polar field science. The vehicles are MTT-154 articulated traction units fitted with dual-band GNSS, towed radar sleds, and onboard logging. The goal is to collect ice-penetrating radar data that complements conventional acquisition while enabling measurements — like coordinated Common Midpoint surveys — that require linked autonomy and precise positioning.
+PolarRover is the software and hardware designs for two autonomous rovers built at LDEO, University of Kansas and Rice University for polar field science. The vehicles are MTT-154 articulated traction units fitted with dual-band GNSS, towed radar sleds, and onboard computing for linked autonomous surveying. These systems can be used to collect conventional radar data while enabling measurements like coordinated Common Midpoint surveys that require linked autonomy and precise positioning.
 
 This project is supported by the OTIC Paros fund.
 
 ## Why rovers
 
-Polar environments are some of the most logistically challenging and expensive research sites on Earth. For every dollar NSF spends on Antarctic science, roughly four go to logistics. The work is physically demanding, which limits who can participate and how much ground a team can cover in a season. Hazards and access barriers lead to critical data gaps, reducing the reproducibility and spatial reach of field measurements.
+Polar environments are some of the most logistically challenging and expensive research sites on Earth. For every dollar NSF spends on Antarctic science, roughly two go to logistics. The work is physically demanding, which limits who can participate and how much ground a team can cover in a season. Hazards and access barriers lead to critical data gaps, reducing the reproducibility and spatial reach of field measurements.
 
-An autonomous platform changes the calculus. A rover can run a pre-loaded survey overnight, hold a repeat-track line to centimeter precision, or spread two vehicles symmetrically about a midpoint for CMP shots — things that are tedious or impossible to do by hand on a featureless ice sheet.
+An autonomous platform can reduce these barriers and run pre-loaded surveys overnight, repeat radar aquisitions at centimeter precision, and spread two vehicles symmetrically about a midpoint for CMP shots, experiments that are tedious or dangerous to conduct manually.
 
 ## Software
 
-The drive software lives under `Software/` and is split into four Python packages. `rover_sim` is the foundation: kinematic vehicle models, a GNSS sensor simulator, safety interlocks, and mission file handling. `rover_drive` builds on that with autonomous drive modes, path-following controllers, an Ensemble Kalman Filter for state estimation, and Dubins path planning. `rover_sim_emulator` ties the two together in a batch test harness with telemetry logging and animation. `rover_sim_startup` is a small FastAPI app for authoring missions and viewing logs offline.
+The drive software lives under `Software/` and is split into four Python packages. `rover_sim` includes kinematic vehicle models, a GNSS sensor simulator, safety interlocks, and mission file handling. `rover_drive` builds on this module with autonomous drive modes, path-following controllers, an Ensemble Kalman Filter for state estimation, and Dubins path planning. `rover_sim_emulator` ties these modules together in a batch test harness with telemetry logging and animation. `rover_sim_startup` is a small FastAPI app for authoring missions and viewing logs offline.
 
 See [Software/README.md](Software/README.md) for details on the control architecture.
 
