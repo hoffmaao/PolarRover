@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Scenarios — PolarRover{% endblock %}
+{% block content %}
+<h1>Scenarios</h1>
+{% if scenarios %}
+<table>
+    <thead>
+        <tr><th>Name</th><th>Controller</th><th>Duration</th><th>Mission</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+    {% for s in scenarios %}
+        <tr>
+            <td>{{ s.name }}</td>
+            <td><code>{{ s.controller }}</code></td>
+            <td>{{ s.duration_s }} s</td>
+            <td>{{ "yes" if s.has_mission else "no" }}</td>
+            <td>
+                <a href="/scenarios/{{ s.name }}/edit">Edit</a>
+                <a href="/scenarios/{{ s.name }}/mission">Map</a>
+                <button hx-delete="/api/scenarios/{{ s.name }}" hx-confirm="Delete {{ s.name }}?" hx-target="closest tr" hx-swap="outerHTML">Delete</button>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No scenarios yet. <a href="/scenarios/new">Create one</a> to get started.</p>
+{% endif %}
+{% endblock %}

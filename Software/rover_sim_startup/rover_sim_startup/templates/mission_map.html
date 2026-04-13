@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Mission Map: {{ scenario.name }} — PolarRover{% endblock %}
+{% block content %}
+<h1>Mission Map: {{ scenario.name }}</h1>
+<p>Controller: <code>{{ scenario.controller.kind }}</code></p>
+
+<div class="map-controls">
+    <label>Mission kind:
+        <select id="mission-kind">
+            <option value="waypoint_survey">Waypoint Survey</option>
+            <option value="multipass_survey">Multipass Survey</option>
+            <option value="cmp_survey">CMP Survey (centerline)</option>
+        </select>
+    </label>
+    <button id="btn-export">Export GeoJSON</button>
+    <button id="btn-upload">Upload to Scenario</button>
+    <span id="status"></span>
+</div>
+<div id="map" style="height:500px; border:1px solid #a8dadc;"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const map = L.map("map", {crs: L.CRS.Simple, minZoom: -5, maxZoom: 5}).setView([0, 0], 0);
+
+const drawnItems = new L.FeatureGroup();
+map.addLayer(drawnItems);
+const drawControl = new L.Control.Draw({
+    edit: {featureGroup: drawnItems},
+    draw: {
+        polygon: false, rectangle: false, circle: false,
+        marker: true,
+        circlemarker: false,
+        polyline: {shapeOptions: {color: "#e63946", weight: 3}}
+    }
+});
+map.addControl(drawControl);
+map.on(L.Draw.Event.CREATED, function(e) {
+    drawnItems.addLayer(e.layer);
+    document.getElementById("status").textContent = "Drawing added. Click Export or Upload when done.";
+});
+
+function buildGeoJSON() {
+    const kind = document.getElementById("mission-kind").value;
+    const roleMap = {waypoint_survey: "path", multipass_survey: "base_track", cmp_survey: "centerline"};
+    const features = [];
+    drawnItems.eachLayer(function(layer) {
+        if (layer.getLatLngs) {
+            const coords = layer.getLatLngs().map(function(p) { return [p.lng, p.lat]; });
+            features.push({
+                type: "Feature",
+                geometry: {type: "LineString", coordinates: coords},
+                properties: {role: roleMap[kind]}
+            });
+        } else if (layer.getLatLng) {
+            const p = layer.getLatLng();
+            features.push({
+                type: "Feature",
+                geometry: {type: "Point", coordinates: [p.lng, p.lat]},
+                properties: {role: "waypoint"}
+            });
+        }
+    });
+    return {
+        type: "FeatureCollection",
+        properties: {mission_kind: kind, mission_version: 1, params: {}},
+        features: features
+    };
+}
+
+document.getElementById("btn-export").addEventListener("click", function() {
+    const geojson = buildGeoJSON();
+    const blob = new Blob([JSON.stringify(geojson, null, 2)], {type: "application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "{{ scenario.name }}_mission.geojson";
+    a.click();
+    document.getElementById("status").textContent = "GeoJSON downloaded.";
+});
+
+document.getElementById("btn-upload").addEventListener("click", async function() {
+    const geojson = buildGeoJSON();
+    if (geojson.features.length === 0) {
+        document.getElementById("status").textContent = "Draw a path on the map first.";
+        return;
+    }
+    const blob = new Blob([JSON.stringify(geojson)], {type: "application/json"});
+    const fd = new FormData();
+    fd.append("file", blob, "{{ scenario.name }}_mission.geojson");
+    const resp = await fetch("/api/scenarios/{{ scenario.name }}/mission", {method: "POST", body: fd});
+    document.getElementById("status").textContent = resp.ok ? "Mission uploaded to scenario." : "Upload failed.";
+});
+</script>
+{% endblock %}

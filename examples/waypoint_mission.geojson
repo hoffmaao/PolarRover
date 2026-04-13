@@ -1,0 +1,152 @@
+{
+  "type": "FeatureCollection",
+  "name": "ross_ice_waypoint_01",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:EPSG::3031"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -250000,
+            500000
+          ],
+          [
+            -249900,
+            500000
+          ],
+          [
+            -249830,
+            500080
+          ],
+          [
+            -249730,
+            500080
+          ],
+          [
+            -249660,
+            500000
+          ],
+          [
+            -249560,
+            500000
+          ]
+        ]
+      },
+      "properties": {
+        "name": "ross_ice_waypoint_01",
+        "description": "Waypoint survey near Ross Ice Shelf",
+        "role": "path",
+        "mission_kind": "waypoint_survey",
+        "mission_version": 1,
+        "epsg": 3031,
+        "n_points": 6,
+        "params": {
+          "approach_mode": "dubins"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -250000,
+          500000
+        ]
+      },
+      "properties": {
+        "name": "WP1",
+        "role": "waypoint",
+        "sequence": 1,
+        "mission_kind": "waypoint_survey"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -249900,
+          500000
+        ]
+      },
+      "properties": {
+        "name": "WP2",
+        "role": "waypoint",
+        "sequence": 2,
+        "mission_kind": "waypoint_survey"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -249830,
+          500080
+        ]
+      },
+      "properties": {
+        "name": "WP3",
+        "role": "waypoint",
+        "sequence": 3,
+        "mission_kind": "waypoint_survey"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -249730,
+          500080
+        ]
+      },
+      "properties": {
+        "name": "WP4",
+        "role": "waypoint",
+        "sequence": 4,
+        "mission_kind": "waypoint_survey"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -249660,
+          500000
+        ]
+      },
+      "properties": {
+        "name": "WP5",
+        "role": "waypoint",
+        "sequence": 5,
+        "mission_kind": "waypoint_survey"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -249560,
+          500000
+        ]
+      },
+      "properties": {
+        "name": "WP6",
+        "role": "waypoint",
+        "sequence": 6,
+        "mission_kind": "waypoint_survey"
+      }
+    }
+  ]
+}

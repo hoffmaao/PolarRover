@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Log Viewer — PolarRover{% endblock %}
+{% block content %}
+<h1>Log Viewer</h1>
+<p>Upload a JSONL telemetry log from an emulator run to view the trajectory and evaluate algorithm performance.</p>
+
+<div class="log-upload">
+    <input type="file" id="log-file" accept=".jsonl,.json,.txt" />
+    <button id="btn-analyze">Analyze</button>
+    <span id="analyze-status"></span>
+</div>
+
+<div id="results" style="display:none;">
+    <h2>Performance Metrics</h2>
+    <table id="metrics-table"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody></tbody></table>
+    <h2>Trajectory</h2>
+    <div id="map" style="height:500px; border:1px solid #a8dadc;"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+var trailMap = null;
+
+document.getElementById("btn-analyze").addEventListener("click", async function() {
+    var fileInput = document.getElementById("log-file");
+    var status = document.getElementById("analyze-status");
+    if (!fileInput.files.length) { status.textContent = "Select a log file first."; return; }
+    status.textContent = "Analyzing...";
+    var fd = new FormData();
+    fd.append("file", fileInput.files[0]);
+    var resp = await fetch("/api/log/analyze", {method: "POST", body: fd});
+    if (!resp.ok) { status.textContent = "Analysis failed."; return; }
+    var data = await resp.json();
+    status.textContent = "";
+    showResults(data);
+});
+
+function showResults(data) {
+    document.getElementById("results").style.display = "block";
+    var tbody = document.querySelector("#metrics-table tbody");
+    tbody.innerHTML = "";
+    var skip = ["trajectory", "noisy_trajectory", "trajectory_a", "trajectory_b", "midpoint_trajectory"];
+    for (var k in data) {
+        if (skip.indexOf(k) >= 0) continue;
+        var tr = document.createElement("tr");
+        var val = typeof data[k] === "object" ? JSON.stringify(data[k]) : data[k];
+        if (typeof val === "number") val = Math.round(val * 1000) / 1000;
+        tr.innerHTML = "<td><strong>" + k + "</strong></td><td>" + val + "</td>";
+        tbody.appendChild(tr);
+    }
+    showMap(data);
+}
+
+function showMap(data) {
+    if (trailMap) trailMap.remove();
+    trailMap = L.map("map", {crs: L.CRS.Simple, minZoom: -5, maxZoom: 5}).setView([0, 0], 0);
+
+    var allPts = [];
+    function addTrack(traj, color, label) {
+        if (!traj || !traj.x || !traj.x.length) return;
+        var pts = traj.x.map(function(x, i) { return [traj.y[i], x]; });
+        L.polyline(pts, {color: color, weight: 2}).addTo(trailMap).bindPopup(label);
+        allPts = allPts.concat(pts);
+    }
+
+    if (data.mode === "single") {
+        addTrack(data.trajectory, "#2a9d8f", "Ground truth");
+        addTrack(data.noisy_trajectory, "#e76f51", "GNSS (noisy)");
+    } else if (data.mode === "linked_cmp") {
+        addTrack(data.trajectory_a, "#2a9d8f", "Rover A");
+        addTrack(data.trajectory_b, "#e63946", "Rover B");
+        addTrack(data.midpoint_trajectory, "#457b9d", "Midpoint");
+    }
+
+    if (allPts.length) trailMap.fitBounds(L.latLngBounds(allPts).pad(0.2));
+}
+</script>
+{% endblock %}

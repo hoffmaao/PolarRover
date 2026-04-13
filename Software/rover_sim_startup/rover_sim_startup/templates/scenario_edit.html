@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}{{ "New Scenario" if is_new else scenario.name }} — PolarRover{% endblock %}
+{% block content %}
+<h1>{{ "New Scenario" if is_new else "Edit: " + scenario.name }}</h1>
+<form id="scenario-form">
+    <fieldset>
+        <legend>General</legend>
+        <label>Name <input type="text" name="name" value="{{ scenario.name if scenario else '' }}" required /></label>
+        <label>Description <input type="text" name="description" value="{{ scenario.description if scenario else '' }}" /></label>
+    </fieldset>
+
+    <fieldset>
+        <legend>Drive Mode</legend>
+        <label>Controller
+            <select name="controller_kind">
+                {% for k in ["teleop", "waypoint", "multipass", "linked_cmp"] %}
+                <option value="{{ k }}" {{ "selected" if scenario and scenario.controller.kind == k else "" }}>{{ k }}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </fieldset>
+
+    <details>
+        <summary>Advanced Settings</summary>
+        <fieldset>
+            <legend>Simulation</legend>
+            <label>Duration (s) <input type="number" name="duration_s" step="0.1" value="{{ scenario.duration_s if scenario else 60 }}" /></label>
+            <label>Time step (s) <input type="number" name="dt_s" step="0.01" value="{{ scenario.dt_s if scenario else 0.05 }}" /></label>
+            <label>Seed <input type="number" name="seed" value="{{ scenario.seed if scenario else 0 }}" /></label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Controller Tuning</legend>
+            <label>Cruise throttle <input type="number" name="cruise_throttle" step="0.01" value="{{ scenario.controller.params.get('cruise_throttle', 0.3) if scenario else 0.3 }}" /></label>
+            <label>Waypoint tolerance (m) <input type="number" name="waypoint_tolerance_m" step="0.1" value="{{ scenario.controller.params.get('waypoint_tolerance_m', 1.0) if scenario else 1.0 }}" /></label>
+            <label>Spread distance (m) <input type="number" name="spread_distance_m" step="0.5" value="{{ scenario.controller.params.get('spread_distance_m', 30.0) if scenario else 30.0 }}" placeholder="CMP only" /></label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Vehicle</legend>
+            <label>Type
+                <select name="vehicle_type">
+                    <option value="single_track" {{ "selected" if scenario and scenario.vehicle.type == "single_track" else "" }}>Single Track (MTT + sled)</option>
+                    <option value="side_by_side_left" {{ "selected" if scenario and scenario.vehicle.type == "side_by_side_left" else "" }}>Side-by-Side Left</option>
+                    <option value="side_by_side_right" {{ "selected" if scenario and scenario.vehicle.type == "side_by_side_right" else "" }}>Side-by-Side Right</option>
+                </select>
+            </label>
+            <label>Arm length (m) <input type="number" name="arm_length_m" step="0.1" value="{{ scenario.vehicle.kinematics.arm_length_m if scenario else 2.5 }}" /></label>
+            <label>Max speed (m/s) <input type="number" name="max_speed_mps" step="0.1" value="{{ scenario.vehicle.kinematics.max_speed_mps if scenario else 5.56 }}" /></label>
+            <label>Learning mode <input type="checkbox" name="learning_mode" {{ "checked" if scenario and scenario.vehicle.safety.learning_mode else "" }} /></label>
+        </fieldset>
+    </details>
+
+    <div style="margin-top:1rem;">
+        <button type="submit">{{ "Create" if is_new else "Save" }}</button>
+        {% if not is_new %}<a href="/scenarios/{{ scenario.name }}/mission" style="margin-left:1rem;">Edit Mission Map</a>{% endif %}
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById("scenario-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const body = {
+        name: fd.get("name"),
+        description: fd.get("description") || "",
+        duration_s: parseFloat(fd.get("duration_s")),
+        dt_s: parseFloat(fd.get("dt_s")),
+        seed: parseInt(fd.get("seed")),
+        vehicle: {
+            type: fd.get("vehicle_type"),
+            kinematics: {arm_length_m: parseFloat(fd.get("arm_length_m")), max_speed_mps: parseFloat(fd.get("max_speed_mps"))},
+            safety: {learning_mode: !!fd.get("learning_mode")},
+        },
+        controller: {
+            kind: fd.get("controller_kind"),
+            params: {
+                cruise_throttle: parseFloat(fd.get("cruise_throttle")),
+                waypoint_tolerance_m: parseFloat(fd.get("waypoint_tolerance_m")),
+                spread_distance_m: parseFloat(fd.get("spread_distance_m")),
+            },
+        },
+    };
+    const isNew = {{ "true" if is_new else "false" }};
+    const method = isNew ? "POST" : "PUT";
+    const url = isNew ? "/api/scenarios" : "/api/scenarios/" + body.name;
+    const resp = await fetch(url, {method: method, headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+    if (resp.ok) window.location.href = "/";
+    else alert("Error: " + (await resp.text()));
+});
+</script>
+{% endblock %}
