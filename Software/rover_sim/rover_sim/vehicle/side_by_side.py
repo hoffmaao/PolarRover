@@ -48,7 +48,12 @@ class SideBySideSkidSteer(Vehicle):
         cfg = self.config
         s = self._state
 
-        stop = cmd.estop_machine or cmd.estop_handle or cmd.neutral
+        stop = (
+            cmd.estop_machine
+            or cmd.estop_handle
+            or cmd.neutral
+            or not cmd.safety_unlocked
+        )
         if stop:
             target_center = 0.0
             target_diff = 0.0

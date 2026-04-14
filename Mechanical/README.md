@@ -1,6 +1,6 @@
 # Mechanical Subsystems
 
-The machnical subsystem of the rover comprises all the material hardwear without any of the electronics. The  mechanical body of the rover relies on drive systems developed by MTT134.
+The machnical subsystem of the rover comprises all the material hardwear without any of the electronics. The mechanical body of the rover relies on the MTT-154 drive systems developed by MTT134.
 
 ## Drive system
 
@@ -12,4 +12,4 @@ Attached to each drive system is an articulated hinge enginneered by MTT. In sin
 
 ## Intrument sled
 
-Towed behind the articulated hinge is the instrument sled with the radar computer hardigg that couples the drive system and instrument payload.
+Towed behind the articulated hinge is the instrument sled with the radar computer used to program the waveform, the digital system that generates, amplifies and transmits the pulse, and the antennas that direct the energy into the subsurface.

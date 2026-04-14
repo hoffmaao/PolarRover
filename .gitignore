@@ -56,8 +56,6 @@ scenarios/local/
 *.mp4
 videos/
 
-# Manuals and PDFs
-*.pdf
 
 # Vendor / confidential — company-proprietary MTT materials, MUST NOT be committed
 vendor/

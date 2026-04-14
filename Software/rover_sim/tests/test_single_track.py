@@ -103,3 +103,11 @@ def test_reset_restores_zero_state():
     assert v.state.x == 0.0
     assert v.state.speed == 0.0
     assert v.state.gamma == 0.0
+
+
+def test_safety_locked_prevents_motion():
+    cfg = SingleTrackArticulatedConfig(max_speed_mps=2.0, accel_mps2=100.0)
+    v = SingleTrackArticulated(cfg)
+    _run(v, CommandBus(throttle=1.0, safety_unlocked=False), steps=200)
+    assert v.state.speed == pytest.approx(0.0, abs=1e-6)
+    assert v.state.x == pytest.approx(0.0, abs=1e-6)

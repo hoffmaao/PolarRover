@@ -1,4 +1,4 @@
-PACKAGES := rover_sim rover_drive rover_sim_emulator rover_sim_startup
+PACKAGES := rover_sim rover_drive rover_hardware rover_sim_emulator rover_sim_startup
 
 .PHONY: help install dev test clean lint
 

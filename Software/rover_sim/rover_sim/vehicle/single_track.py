@@ -65,7 +65,7 @@ class SingleTrackArticulated(Vehicle):
             new_speed = _decelerate(s.speed, cfg.brake_decel_mps2, dt)
             return self._integrate(new_speed, s.gamma, dt)
 
-        if cmd.neutral:
+        if cmd.neutral or not cmd.safety_unlocked:
             target_v = 0.0
         else:
             sign = 1.0 if cmd.direction == Direction.FORWARD else -1.0

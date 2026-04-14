@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "rover_hardware"
+version = "0.0.1"
+description = "Hardware backends that bridge CommandBus to the MTT-154 CAN bus"
+requires-python = ">=3.10"
+authors = [{ name = "hoffmaao" }]
+dependencies = [
+    "rover_sim",
+]
+
+[project.optional-dependencies]
+can = [
+    "python-can>=4.3",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["rover_hardware"]

@@ -32,7 +32,7 @@ rover-sim-emu demo multipass
 rover-sim-emu demo cmp
 ```
 
-Example mission files in `examples/` show the GeoJSON format for waypoint surveys, repeat-track radar lines, and two-rover CMP spreads. All coordinates are in EPSG:3031 (Antarctic Polar Stereographic).
+Example mission files in `Simulator/examples/` show the GeoJSON format for waypoint surveys, repeat-track radar lines, and two-rover CMP spreads. All coordinates are in EPSG:3031 (Antarctic Polar Stereographic).
 
 ## Hardware
 
@@ -40,7 +40,7 @@ The vehicle is an MTT-154 single-track articulated traction unit with a rate-com
 
 ## Repository layout
 
-`Electrical/`, `Instruments/`, and `Mechanical/` contain subsystem documentation and specifications. `Software/` has the full drive stack. `examples/` has sample mission files.
+`Electrical/`, `Instruments/`, and `Mechanical/` contain subsystem documentation and specifications. `Software/` has the full drive stack. `Simulator/` holds example missions, generated telemetry, and rendered outputs. `Testing/` has the bench test director — the campaign that takes the system from working in simulation to working on the MTT.
 
 ## License
 
