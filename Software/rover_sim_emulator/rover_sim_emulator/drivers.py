@@ -4,7 +4,7 @@ import math
 from typing import Any, Optional
 
 from rover_sim.control import Driver
-from rover_sim.missions import Mission
+from rover_sim.surveys import Survey
 
 from rover_drive.estimation import EnKFConfig, EnsembleKalmanFilter
 from rover_drive.modes import (
@@ -24,7 +24,7 @@ _AVAILABLE_KINDS = ["teleop", "waypoint", "multipass"]
 def create_driver(
     kind: str,
     params: dict[str, Any],
-    mission: Optional[Mission],
+    mission: Optional[Survey],
 ) -> Driver:
     """
     Resolve a ``(kind, params)`` pair from the scenario config into a
@@ -62,11 +62,11 @@ def _make_teleop(params: dict[str, Any]) -> TeleopDriver:
 
 
 def _make_waypoint(
-    params: dict[str, Any], mission: Optional[Mission]
+    params: dict[str, Any], mission: Optional[Survey]
 ) -> WaypointDriver:
     if mission is None:
         raise ValueError(
-            "waypoint controller requires a mission_path in the scenario config"
+            "waypoint controller requires a survey_path in the scenario config"
         )
 
     controller_config = WaypointControllerConfig()
@@ -85,11 +85,11 @@ def _make_waypoint(
 
 
 def _make_multipass(
-    params: dict[str, Any], mission: Optional[Mission]
+    params: dict[str, Any], mission: Optional[Survey]
 ) -> MultipassDriver:
     if mission is None:
         raise ValueError(
-            "multipass controller requires a mission_path in the scenario config"
+            "multipass controller requires a survey_path in the scenario config"
         )
 
     controller_config = MultipassControllerConfig()

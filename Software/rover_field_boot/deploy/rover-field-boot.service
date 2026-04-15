@@ -1,0 +1,22 @@
+[Unit]
+Description=Nisse field boot — load survey from card or disk and dispatch
+After=rover-onboard.service
+Requires=rover-onboard.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+User=nisse
+Group=nisse
+Environment=NISSE_ROOT=/opt/nisse
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/nisse/venv/bin/rover-field-boot \
+    --surveys-dir /opt/nisse/surveys \
+    --select active_file \
+    --active-file /media/nisse/NISSE/surveys/active.txt \
+    --log-path /var/log/nisse/run-%%M-%%H-%%d.jsonl
+# Exit code 0 when no survey is loaded leaves the rover in teleop state.
+SuccessExitStatus=0 1
+
+[Install]
+WantedBy=multi-user.target

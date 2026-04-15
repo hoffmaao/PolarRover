@@ -45,7 +45,7 @@ def test_extract_fused_reference_track(tmp_path: Path):
 
     data = json.loads(result.read_text())
     feat_props = data["features"][0]["properties"]
-    assert feat_props["mission_kind"] == "multipass_survey"
+    assert feat_props["survey_kind"] == "multipass_survey"
     assert feat_props["source_stream"] == "fused"
     assert "3031" in data["crs"]["properties"]["name"]
 
@@ -137,7 +137,7 @@ def test_extracted_track_loads_as_valid_mission(tmp_path: Path):
     _write_fake_log(log, n_steps=200)
     extract_reference_track(log, out, source="fused", spacing_m=0.5)
 
-    from rover_sim.missions import load_mission
-    mission = load_mission(out)
+    from rover_sim.surveys import load_survey
+    mission = load_survey(out)
     assert mission.kind.value == "multipass_survey"
     assert len(mission.waypoints) > 10

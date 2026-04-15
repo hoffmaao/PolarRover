@@ -18,23 +18,23 @@
             500000
           ],
           [
-            -249950,
+            -249800,
             500000
           ]
         ]
       },
       "properties": {
         "name": "ross_ice_cmp_01",
-        "description": "CMP survey \u2014 30m max spread, east-west axis",
+        "description": "CMP survey — rovers spread to 200 m each side of the midpoint (400 m total), east-west axis",
         "role": "centerline",
-        "mission_kind": "cmp_survey",
-        "mission_version": 1,
+        "survey_kind": "cmp_survey",
+        "survey_version": 1,
         "epsg": 3031,
         "n_points": 2,
         "params": {
           "spread_mode": "constant",
           "start_spread_m": 2.0,
-          "end_spread_m": 30.0
+          "end_spread_m": 400.0
         }
       }
     },
@@ -50,7 +50,7 @@
       "properties": {
         "name": "Midpoint (base station)",
         "role": "midpoint",
-        "mission_kind": "cmp_survey"
+        "survey_kind": "cmp_survey"
       }
     }
   ]

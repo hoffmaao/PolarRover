@@ -17,7 +17,7 @@ for multipass repeat-track surveys where path fidelity is the primary metric.
 import math
 from dataclasses import dataclass
 
-from rover_sim.missions import Waypoint
+from rover_sim.surveys import Waypoint
 from rover_drive.controllers.base import ControlOutput, PathController
 
 

@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "rover_drive"
 version = "0.0.1"
-description = "PolarRover drive code: teleop, waypoint, multipass, and linked-CMP navigation modes"
+description = "Nisse drive code: teleop, waypoint, multipass, and linked-CMP navigation modes"
 requires-python = ">=3.10"
 authors = [{ name = "hoffmaao" }]
 dependencies = [

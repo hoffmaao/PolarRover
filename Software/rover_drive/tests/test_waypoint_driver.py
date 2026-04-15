@@ -4,15 +4,15 @@ import numpy as np
 import pytest
 
 from rover_sim.control import FixType, RoverState
-from rover_sim.missions import Mission, MissionKind, Waypoint
+from rover_sim.surveys import Survey, SurveyKind, Waypoint
 
 from rover_drive.estimation import EnKFConfig, EnsembleKalmanFilter
 from rover_drive.modes.waypoint import WaypointControllerConfig, WaypointDriver
 
 
-def _mission(*coords: tuple[float, float]) -> Mission:
-    return Mission(
-        kind=MissionKind.WAYPOINT,
+def _mission(*coords: tuple[float, float]) -> Survey:
+    return Survey(
+        kind=SurveyKind.WAYPOINT,
         waypoints=[Waypoint(x=x, y=y) for x, y in coords],
     )
 
@@ -52,7 +52,7 @@ def test_mission_required():
 
 def test_empty_mission_raises():
     driver = _seeded_driver()
-    mission = Mission(kind=MissionKind.WAYPOINT, waypoints=[])
+    mission = Survey(kind=SurveyKind.WAYPOINT, waypoints=[])
     with pytest.raises(RuntimeError, match="non-empty"):
         driver.update(_state(), mission, dt=0.05)
 

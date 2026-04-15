@@ -92,7 +92,7 @@ class ScenarioConfig(BaseModel):
 
     vehicle: VehicleConfig = Field(default_factory=VehicleConfig)
     controller: ControllerConfig = Field(default_factory=ControllerConfig)
-    mission_path: Optional[str] = None
+    survey_path: Optional[str] = None
 
     @classmethod
     def from_yaml(cls, path: str | Path) -> "ScenarioConfig":

@@ -43,8 +43,8 @@
         "name": "ross_ice_waypoint_01",
         "description": "Waypoint survey near Ross Ice Shelf",
         "role": "path",
-        "mission_kind": "waypoint_survey",
-        "mission_version": 1,
+        "survey_kind": "waypoint_survey",
+        "survey_version": 1,
         "epsg": 3031,
         "n_points": 6,
         "params": {
@@ -65,7 +65,7 @@
         "name": "WP1",
         "role": "waypoint",
         "sequence": 1,
-        "mission_kind": "waypoint_survey"
+        "survey_kind": "waypoint_survey"
       }
     },
     {
@@ -81,7 +81,7 @@
         "name": "WP2",
         "role": "waypoint",
         "sequence": 2,
-        "mission_kind": "waypoint_survey"
+        "survey_kind": "waypoint_survey"
       }
     },
     {
@@ -97,7 +97,7 @@
         "name": "WP3",
         "role": "waypoint",
         "sequence": 3,
-        "mission_kind": "waypoint_survey"
+        "survey_kind": "waypoint_survey"
       }
     },
     {
@@ -113,7 +113,7 @@
         "name": "WP4",
         "role": "waypoint",
         "sequence": 4,
-        "mission_kind": "waypoint_survey"
+        "survey_kind": "waypoint_survey"
       }
     },
     {
@@ -129,7 +129,7 @@
         "name": "WP5",
         "role": "waypoint",
         "sequence": 5,
-        "mission_kind": "waypoint_survey"
+        "survey_kind": "waypoint_survey"
       }
     },
     {
@@ -145,7 +145,7 @@
         "name": "WP6",
         "role": "waypoint",
         "sequence": 6,
-        "mission_kind": "waypoint_survey"
+        "survey_kind": "waypoint_survey"
       }
     }
   ]

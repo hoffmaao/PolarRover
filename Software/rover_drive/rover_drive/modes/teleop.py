@@ -1,4 +1,4 @@
-"""Teleop driver — the default manual-control mode for PolarRover."""
+"""Teleop driver — the default manual-control mode for Nisse."""
 
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -7,7 +7,7 @@ from typing import Any, Optional, Protocol, runtime_checkable
 import yaml
 
 from rover_sim.control import CommandBus, Direction, DirectionMode, RoverState
-from rover_sim.missions import Mission
+from rover_sim.surveys import Survey
 
 
 @runtime_checkable
@@ -123,7 +123,7 @@ class TeleopDriver:
     def update(
         self,
         state: RoverState,
-        mission: Optional[Mission],
+        mission: Optional[Survey],
         dt: float,
     ) -> CommandBus:
         cmd = self._source.command_at(self._t)

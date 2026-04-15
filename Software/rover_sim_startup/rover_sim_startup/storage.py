@@ -19,7 +19,7 @@ def list_scenarios(directory: Path) -> list[dict]:
                 "description": cfg.description,
                 "controller": cfg.controller.kind,
                 "duration_s": cfg.duration_s,
-                "has_mission": cfg.mission_path is not None,
+                "has_mission": cfg.survey_path is not None,
             })
         except Exception:
             result.append({"name": f.stem, "description": "(invalid YAML)", "controller": "?",
@@ -45,9 +45,9 @@ def delete_scenario(directory: Path, name: str) -> None:
     path = directory / f"{name}.yaml"
     if path.exists():
         path.unlink()
-    mission_path = directory / f"{name}_mission.geojson"
-    if mission_path.exists():
-        mission_path.unlink()
+    survey_path = directory / f"{name}_mission.geojson"
+    if survey_path.exists():
+        survey_path.unlink()
 
 
 def save_mission(directory: Path, scenario_name: str, geojson_bytes: bytes) -> Path:

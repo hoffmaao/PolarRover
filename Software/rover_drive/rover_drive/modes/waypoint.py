@@ -7,7 +7,7 @@ from typing import Optional
 import numpy as np
 
 from rover_sim.control import CommandBus, DirectionMode, FixType, RoverState
-from rover_sim.missions import Mission
+from rover_sim.surveys import Survey
 
 from rover_drive.estimation import (
     STATE_HEADING,
@@ -91,7 +91,7 @@ class WaypointDriver:
     def update(
         self,
         state: RoverState,
-        mission: Optional[Mission],
+        mission: Optional[Survey],
         dt: float,
     ) -> CommandBus:
         if mission is None:
@@ -126,7 +126,7 @@ class WaypointDriver:
             self.enkf.update_from_gnss(state)
             self._last_obs_t = state.t
 
-    def _compute_command(self, mission: Mission) -> CommandBus:
+    def _compute_command(self, mission: Survey) -> CommandBus:
         if not self._initialized:
             return _brake_cmd()
         if self._complete:

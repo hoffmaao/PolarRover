@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Nisse — {{ snapshot.rover_name }}</title>
+  <style>
+    body { font-family: ui-monospace, Menlo, monospace; background: #111; color: #eee; margin: 0; padding: 0; }
+    header { padding: 0.75rem 1rem; background: #000; border-bottom: 1px solid #333; }
+    header h1 { margin: 0; font-size: 1.1rem; font-weight: 500; }
+    main { display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; padding: 1rem; }
+    .video { background: #000; border: 1px solid #333; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; }
+    .video img { width: 100%; height: 100%; object-fit: cover; }
+    .state { background: #181818; border: 1px solid #333; padding: 1rem; }
+    .state h2 { margin: 0 0 0.5rem 0; font-size: 0.85rem; letter-spacing: 0.05em; color: #999; text-transform: uppercase; }
+    .state dl { margin: 0 0 1rem 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 1rem; font-size: 0.9rem; }
+    .state dt { color: #777; }
+    .state dd { margin: 0; color: #eee; }
+    .fix { font-weight: 600; }
+    .fix.fixed { color: #6fbf73; }
+    .fix.float { color: #f2b73f; }
+    .fix.dgps { color: #f2b73f; }
+    .fix.spp, .fix.none { color: #e26060; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="title">Nisse — {{ snapshot.rover_name }}</h1>
+  </header>
+  <main>
+    <div class="video">
+      <img src="/video_feed?source=oakd_color" alt="Live camera feed">
+    </div>
+    <div class="state">
+      <h2>Mode</h2>
+      <dl><dt>mode</dt><dd id="mode">{{ snapshot.mode }}</dd></dl>
+
+      <h2>Position</h2>
+      <dl>
+        <dt>x (m)</dt><dd id="x">{{ snapshot.position_x_m }}</dd>
+        <dt>y (m)</dt><dd id="y">{{ snapshot.position_y_m }}</dd>
+        <dt>heading</dt><dd id="heading">{{ snapshot.drive.heading_rad }}</dd>
+        <dt>speed (m/s)</dt><dd id="speed">{{ snapshot.drive.actual_speed_mps }}</dd>
+      </dl>
+
+      <h2>GNSS</h2>
+      <dl>
+        <dt>fix</dt><dd><span id="fix" class="fix {{ snapshot.gnss.fix_type }}">{{ snapshot.gnss.fix_type }}</span></dd>
+        <dt>sats</dt><dd id="sats">{{ snapshot.gnss.num_satellites }}</dd>
+        <dt>hdop</dt><dd id="hdop">{{ snapshot.gnss.hdop }}</dd>
+      </dl>
+
+      <h2>Battery</h2>
+      <dl>
+        <dt>soc</dt><dd id="soc">{{ snapshot.battery.soc_percent }}%</dd>
+        <dt>voltage</dt><dd id="voltage">{{ snapshot.battery.voltage_v }} V</dd>
+      </dl>
+
+      <h2>Survey</h2>
+      <dl>
+        <dt>name</dt><dd id="survey_name">{{ snapshot.survey.name }}</dd>
+        <dt>progress</dt><dd id="survey_progress">{{ snapshot.survey.waypoint_index }} / {{ snapshot.survey.waypoint_count }}</dd>
+      </dl>
+    </div>
+  </main>
+  <script>
+    const ws = new WebSocket(`ws://${location.host}/ws/state`);
+    ws.onmessage = ev => {
+      const s = JSON.parse(ev.data);
+      document.getElementById("title").textContent = "Nisse — " + s.rover_name;
+      document.getElementById("mode").textContent = s.mode;
+      document.getElementById("x").textContent = s.position_x_m ?? "—";
+      document.getElementById("y").textContent = s.position_y_m ?? "—";
+      document.getElementById("heading").textContent = s.drive.heading_rad ?? "—";
+      document.getElementById("speed").textContent = s.drive.actual_speed_mps ?? "—";
+      const fix = document.getElementById("fix");
+      fix.textContent = s.gnss.fix_type;
+      fix.className = "fix " + s.gnss.fix_type;
+      document.getElementById("sats").textContent = s.gnss.num_satellites ?? "—";
+      document.getElementById("hdop").textContent = s.gnss.hdop ?? "—";
+      document.getElementById("soc").textContent = (s.battery.soc_percent ?? "—") + "%";
+      document.getElementById("voltage").textContent = (s.battery.voltage_v ?? "—") + " V";
+      document.getElementById("survey_name").textContent = s.survey.name ?? "—";
+      document.getElementById("survey_progress").textContent =
+        (s.survey.waypoint_index ?? "—") + " / " + (s.survey.waypoint_count ?? "—");
+    };
+  </script>
+</body>
+</html>

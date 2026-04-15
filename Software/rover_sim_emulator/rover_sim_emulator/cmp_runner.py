@@ -6,7 +6,7 @@ from typing import Any, Optional
 
 from rover_sim.config import ScenarioConfig
 from rover_sim.control import FixType, RoverState
-from rover_sim.missions import Mission, Waypoint, load_mission
+from rover_sim.surveys import Survey, Waypoint, load_survey
 from rover_sim.safety import SafetyConfig, SafetyFilter
 from rover_sim.sensors import GnssConfig, GnssSensor
 from rover_sim.vehicle import (
@@ -45,9 +45,9 @@ class LinkedCMPRunner:
 
     def __init__(self, config: ScenarioConfig) -> None:
         self.config = config
-        if not config.mission_path:
-            raise ValueError("linked_cmp requires a mission_path in the scenario config")
-        self.mission: Mission = load_mission(config.mission_path)
+        if not config.survey_path:
+            raise ValueError("linked_cmp requires a survey_path in the scenario config")
+        self.mission: Survey = load_survey(config.survey_path)
         if len(self.mission.waypoints) < 2:
             raise ValueError("linked_cmp mission must have at least 2 centerline points")
 

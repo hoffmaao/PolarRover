@@ -3,8 +3,8 @@ from enum import Enum
 from typing import Any
 
 
-class MissionKind(Enum):
-    """Matches the `mission_kind` metadata tag in a mission.geojson file."""
+class SurveyKind(Enum):
+    """Matches the `survey_kind` metadata tag in a mission.geojson file."""
 
     WAYPOINT = "waypoint_survey"
     MULTIPASS = "multipass_survey"
@@ -14,10 +14,10 @@ class MissionKind(Enum):
 @dataclass(frozen=True)
 class Waypoint:
     """
-    A single reference point along a mission path. Units are whatever frame
-    the mission was loaded into. For Phase 2 we accept raw GeoJSON longitude /
-    latitude (so x=lon, y=lat); a future phase will project through ugv_common
-    geodesy before the controllers see them.
+    A single reference point along a survey path. Units are whatever frame
+    the survey was loaded into — the simulator and the field rover both
+    expect coordinates already projected to the scenario CRS (EPSG:3031
+    for the polar deployment), not raw WGS84 lat/lon.
     """
 
     x: float
@@ -26,7 +26,7 @@ class Waypoint:
 
 
 @dataclass
-class Mission:
+class Survey:
     """
     A loaded mission: a list of waypoints plus mission-kind-specific params.
     The controller that consumes this mission is selected from `kind`:
@@ -35,6 +35,6 @@ class Mission:
       CMP       → two-rover coordinated drive around a shared midpoint
     """
 
-    kind: MissionKind
+    kind: SurveyKind
     waypoints: list[Waypoint] = field(default_factory=list)
     params: dict[str, Any] = field(default_factory=dict)

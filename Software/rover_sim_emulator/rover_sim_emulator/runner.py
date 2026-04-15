@@ -6,7 +6,7 @@ from typing import Any, Optional
 
 from rover_sim.config import ScenarioConfig
 from rover_sim.control import CommandBus, Direction, DirectionMode, Driver, FixType, RoverState
-from rover_sim.missions import Mission, load_mission
+from rover_sim.surveys import Survey, load_survey
 from rover_sim.safety import SafetyConfig, SafetyFilter
 from rover_sim.sensors import GnssConfig, GnssSensor
 from rover_sim.vehicle import (
@@ -43,8 +43,8 @@ class ScenarioRunner:
 
     def __init__(self, config: ScenarioConfig) -> None:
         self.config = config
-        self.mission: Optional[Mission] = (
-            load_mission(config.mission_path) if config.mission_path else None
+        self.mission: Optional[Survey] = (
+            load_survey(config.survey_path) if config.survey_path else None
         )
         self.vehicle: Vehicle = self._build_vehicle()
         self.safety = SafetyFilter(self._build_safety_config())

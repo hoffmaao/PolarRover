@@ -7,7 +7,7 @@ from typing import Optional
 import numpy as np
 
 from rover_sim.control import CommandBus, DirectionMode, FixType, RoverState
-from rover_sim.missions import Mission, Waypoint
+from rover_sim.surveys import Survey, Waypoint
 
 from rover_drive.controllers.base import PathController
 from rover_drive.estimation import (
@@ -125,7 +125,7 @@ class MultipassDriver:
     def update(
         self,
         state: RoverState,
-        mission: Optional[Mission],
+        mission: Optional[Survey],
         dt: float,
     ) -> CommandBus:
         if mission is None or not mission.waypoints:
@@ -158,7 +158,7 @@ class MultipassDriver:
 
     # ---------- control ----------
 
-    def _compute_command(self, mission: Mission) -> CommandBus:
+    def _compute_command(self, mission: Survey) -> CommandBus:
         if not self._initialized or self._complete:
             return _brake_cmd()
 

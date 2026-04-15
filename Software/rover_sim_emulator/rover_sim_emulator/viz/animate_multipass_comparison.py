@@ -16,7 +16,7 @@ def render_multipass_comparison_video(
     original_log_path: str | Path,
     repeat_log_path: str | Path,
     output_path: str | Path,
-    mission_path: Optional[str | Path] = None,
+    survey_path: Optional[str | Path] = None,
     fps: int = 20,
     dpi: int = 100,
 ) -> Path:
@@ -34,7 +34,7 @@ def render_multipass_comparison_video(
 
     orig = _load_log(Path(original_log_path))
     repeat = _load_log(Path(repeat_log_path))
-    base_track = _load_waypoints(mission_path) if mission_path else []
+    base_track = _load_waypoints(survey_path) if survey_path else []
 
     orig_x = [r["truth"]["x"] for r in orig]
     orig_y = [r["truth"]["y"] for r in orig]
@@ -135,7 +135,7 @@ def render_multipass_comparison_video(
 
     n_frames = len(repeat) // subsample
     anim = FuncAnimation(fig, update, frames=n_frames, interval=1000 // fps, blit=False)
-    writer = FFMpegWriter(fps=fps, metadata={"title": "PolarRover Multipass Repeat"}, bitrate=2500)
+    writer = FFMpegWriter(fps=fps, metadata={"title": "Nisse Multipass Repeat"}, bitrate=2500)
     anim.save(str(output_path), writer=writer, dpi=dpi)
     plt.close(fig)
     return output_path

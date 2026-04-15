@@ -1,6 +1,6 @@
 """GeoJSON mission loader and writer — QGIS/ArcGIS compatible.
 
-Mission files are standard GeoJSON FeatureCollections that open directly in
+Survey files are standard GeoJSON FeatureCollections that open directly in
 GIS software (QGIS, ArcGIS, Google Earth). The CRS is declared via a "crs"
 member (GeoJSON 2008 / QGIS convention) and all rover-specific metadata
 lives in per-feature properties (visible as attribute table columns in GIS).
@@ -23,7 +23,7 @@ import json
 from pathlib import Path
 from typing import Any, Optional, Union
 
-from rover_sim.missions.base import Mission, MissionKind, Waypoint
+from rover_sim.surveys.base import Survey, SurveyKind, Waypoint
 
 
 # ============================================================
@@ -31,33 +31,33 @@ from rover_sim.missions.base import Mission, MissionKind, Waypoint
 # ============================================================
 
 
-def load_mission(path: Union[str, Path]) -> Mission:
+def load_survey(path: Union[str, Path]) -> Survey:
     """Load a mission from a GeoJSON file."""
     data = json.loads(Path(path).read_text())
     return from_geojson_dict(data)
 
 
-def from_geojson_dict(data: dict[str, Any]) -> Mission:
-    """Parse a GeoJSON FeatureCollection into a typed Mission."""
+def from_geojson_dict(data: dict[str, Any]) -> Survey:
+    """Parse a GeoJSON FeatureCollection into a typed Survey."""
     if data.get("type") != "FeatureCollection":
         raise ValueError(f"expected FeatureCollection, got {data.get('type')!r}")
 
-    # Mission kind: check per-feature first (GIS-friendly), fall back to top-level
+    # Survey kind: check per-feature first (GIS-friendly), fall back to top-level
     kind_str = None
     for f in data.get("features", []):
-        fk = (f.get("properties") or {}).get("mission_kind")
+        fk = (f.get("properties") or {}).get("survey_kind")
         if fk:
             kind_str = fk
             break
     if kind_str is None:
-        kind_str = data.get("properties", {}).get("mission_kind")
+        kind_str = data.get("properties", {}).get("survey_kind")
     if kind_str is None:
-        raise ValueError("mission.geojson missing mission_kind (in feature properties or top-level)")
+        raise ValueError("mission.geojson missing survey_kind (in feature properties or top-level)")
 
     try:
-        kind = MissionKind(kind_str)
+        kind = SurveyKind(kind_str)
     except ValueError as e:
-        raise ValueError(f"unknown mission_kind: {kind_str!r}") from e
+        raise ValueError(f"unknown survey_kind: {kind_str!r}") from e
 
     features = data.get("features", [])
     coords = _extract_base_line(features, kind)
@@ -79,7 +79,7 @@ def from_geojson_dict(data: dict[str, Any]) -> Mission:
         crs_name = crs.get("properties", {}).get("name", "")
         if "4326" in crs_name:
             raise ValueError(
-                "This mission file uses EPSG:4326 (WGS84 lat/lon). PolarRover "
+                "This mission file uses EPSG:4326 (WGS84 lat/lon). Nisse "
                 "requires projected coordinates in EPSG:3031 (Antarctic Polar "
                 "Stereographic) because heading calculations between waypoints "
                 "are inaccurate in spherical coordinates at polar latitudes. "
@@ -93,13 +93,13 @@ def from_geojson_dict(data: dict[str, Any]) -> Mission:
             raise ValueError(
                 "Coordinates appear to be WGS84 lat/lon (values in the "
                 "[-180,180] / [-90,90] range) but no CRS is declared. "
-                "PolarRover requires EPSG:3031 (Antarctic Polar Stereographic) "
+                "Nisse requires EPSG:3031 (Antarctic Polar Stereographic) "
                 "coordinates in meters. Re-project and add a CRS declaration."
             )
 
-    mission = Mission(kind=kind, waypoints=waypoints, params=params)
+    mission = Survey(kind=kind, waypoints=waypoints, params=params)
 
-    if kind == MissionKind.MULTIPASS:
+    if kind == SurveyKind.MULTIPASS:
         mission = _expand_multipass(mission)
     return mission
 
@@ -111,7 +111,7 @@ def from_geojson_dict(data: dict[str, Any]) -> Mission:
 
 def write_mission(
     path: Union[str, Path],
-    kind: MissionKind,
+    kind: SurveyKind,
     coordinates: list[list[float]],
     epsg: int = 3031,
     params: Optional[dict[str, Any]] = None,
@@ -160,8 +160,8 @@ def write_mission(
                     "name": name,
                     "description": description,
                     "role": role,
-                    "mission_kind": kind.value,
-                    "mission_version": 1,
+                    "survey_kind": kind.value,
+                    "survey_version": 1,
                     "epsg": epsg,
                     "n_points": len(coordinates),
                     "params": params,
@@ -171,7 +171,7 @@ def write_mission(
     }
 
     # Add waypoint markers for waypoint surveys
-    if kind == MissionKind.WAYPOINT:
+    if kind == SurveyKind.WAYPOINT:
         for i, coord in enumerate(coordinates):
             doc["features"].append({
                 "type": "Feature",
@@ -180,19 +180,19 @@ def write_mission(
                     "name": f"WP{i + 1}",
                     "role": "waypoint",
                     "sequence": i + 1,
-                    "mission_kind": kind.value,
+                    "survey_kind": kind.value,
                 },
             })
 
     # Add midpoint marker for CMP surveys
-    if kind == MissionKind.CMP and len(coordinates) >= 1:
+    if kind == SurveyKind.CMP and len(coordinates) >= 1:
         doc["features"].append({
             "type": "Feature",
             "geometry": {"type": "Point", "coordinates": coordinates[0]},
             "properties": {
                 "name": "Midpoint (base station)",
                 "role": "midpoint",
-                "mission_kind": kind.value,
+                "survey_kind": kind.value,
             },
         })
 
@@ -205,15 +205,15 @@ def write_mission(
 # ============================================================
 
 
-_ROLE_FOR_KIND: dict[MissionKind, str] = {
-    MissionKind.WAYPOINT: "path",
-    MissionKind.MULTIPASS: "base_track",
-    MissionKind.CMP: "centerline",
+_ROLE_FOR_KIND: dict[SurveyKind, str] = {
+    SurveyKind.WAYPOINT: "path",
+    SurveyKind.MULTIPASS: "base_track",
+    SurveyKind.CMP: "centerline",
 }
 
 
 def _extract_base_line(
-    features: list[dict[str, Any]], kind: MissionKind
+    features: list[dict[str, Any]], kind: SurveyKind
 ) -> list[tuple[float, float]]:
     expected_role = _ROLE_FOR_KIND[kind]
 
@@ -233,7 +233,7 @@ def _extract_base_line(
     raise ValueError(f"no LineString feature found for {kind.value}")
 
 
-def _expand_multipass(mission: Mission) -> Mission:
+def _expand_multipass(mission: Survey) -> Survey:
     """Expand a multipass base track into the full N-pass sequence."""
     n_passes = int(mission.params.get("n_passes", 1))
     direction = mission.params.get("pass_direction", "alternating")
@@ -247,4 +247,4 @@ def _expand_multipass(mission: Mission) -> Mission:
             sequence.extend(reversed(base))
         else:
             sequence.extend(base)
-    return Mission(kind=mission.kind, waypoints=sequence, params=dict(mission.params))
+    return Survey(kind=mission.kind, waypoints=sequence, params=dict(mission.params))

@@ -5,7 +5,7 @@ from enum import Enum
 class FixType(Enum):
     """
     GNSS fix quality ladder. Modeled after the u-blox ZED-F9P dual-band RTK
-    receiver, which is the PolarRover's primary position sensor. Ordered from
+    receiver, which is the Nisse's primary position sensor. Ordered from
     worst to best for comparison purposes.
     """
 

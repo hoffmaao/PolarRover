@@ -18,18 +18,28 @@ import numpy as np
 def render_single_rover_video(
     log_path: str | Path,
     output_path: str | Path,
-    mission_path: Optional[str | Path] = None,
+    survey_path: Optional[str | Path] = None,
     fps: int = 20,
     trail_len: int = 200,
     dpi: int = 100,
+    persistent_path: bool = True,
 ) -> Path:
-    """Render an animated video of a single-rover scenario run."""
+    """Render an animated video of a single-rover scenario run.
+
+    The ground-truth and EnKF trails draw the full run history from start
+    to the current frame when ``persistent_path`` is True (the default),
+    so the full rover path stays visible on screen for the length of the
+    video. Set ``persistent_path=False`` to fall back to a sliding window
+    of ``trail_len`` samples — useful for very long missions where the
+    earliest history is no longer interesting. The GNSS scatter always
+    uses the sliding window to keep the fix cloud readable.
+    """
     log_path = Path(log_path)
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     records = _load_log(log_path)
-    waypoints = _load_waypoints(mission_path) if mission_path else []
+    waypoints = _load_waypoints(survey_path) if survey_path else []
 
     truth_x = [r["truth"]["x"] for r in records]
     truth_y = [r["truth"]["y"] for r in records]
@@ -70,7 +80,7 @@ def render_single_rover_video(
                         bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="#ccc"))
 
     ax.legend(loc="upper right", fontsize=8, framealpha=0.9)
-    ax.set_title("PolarRover Simulation", fontweight="bold")
+    ax.set_title("Nisse Simulation", fontweight="bold")
 
     # For the EnKF trail we'll use a running average as a proxy (since the log
     # doesn't store the filter mean directly — it stores noisy observations).
@@ -84,15 +94,19 @@ def render_single_rover_video(
 
     def update(frame_idx):
         i = min(frame_idx * subsample, len(records) - 1)
-        start = max(0, i - trail_len)
+        # GNSS stays windowed so the fix cloud doesn't smother the plot;
+        # the ground-truth and EnKF trails either track the whole run
+        # from zero or window with everything else.
+        window_start = max(0, i - trail_len)
+        path_start = 0 if persistent_path else window_start
 
-        truth_trail.set_data(truth_x[start:i + 1], truth_y[start:i + 1])
+        truth_trail.set_data(truth_x[path_start:i + 1], truth_y[path_start:i + 1])
 
-        gx = gnss_x[max(0, i - trail_len):i + 1]
-        gy = gnss_y[max(0, i - trail_len):i + 1]
+        gx = gnss_x[window_start:i + 1]
+        gy = gnss_y[window_start:i + 1]
         gnss_scatter.set_offsets(np.column_stack([gx, gy]) if gx else np.empty((0, 2)))
 
-        enkf_trail.set_data(enkf_x[start:i + 1], enkf_y[start:i + 1])
+        enkf_trail.set_data(enkf_x[path_start:i + 1], enkf_y[path_start:i + 1])
 
         rover_dot.set_data([truth_x[i]], [truth_y[i]])
 
@@ -112,7 +126,7 @@ def render_single_rover_video(
 
     n_frames = len(records) // subsample
     anim = FuncAnimation(fig, update, init_func=init, frames=n_frames, interval=1000 // fps, blit=False)
-    writer = FFMpegWriter(fps=fps, metadata={"title": "PolarRover Sim"}, bitrate=2000)
+    writer = FFMpegWriter(fps=fps, metadata={"title": "Nisse Sim"}, bitrate=2000)
     anim.save(str(output_path), writer=writer, dpi=dpi)
     plt.close(fig)
     return output_path
@@ -121,18 +135,25 @@ def render_single_rover_video(
 def render_cmp_video(
     log_path: str | Path,
     output_path: str | Path,
-    mission_path: Optional[str | Path] = None,
+    survey_path: Optional[str | Path] = None,
     fps: int = 20,
     trail_len: int = 200,
     dpi: int = 100,
+    persistent_path: bool = True,
 ) -> Path:
-    """Render an animated video of a linked CMP dual-rover scenario."""
+    """Render an animated video of a linked CMP dual-rover scenario.
+
+    Both rover trails and the midpoint trace default to the full history
+    (``persistent_path=True``) so the spread geometry is visible end to
+    end. The per-rover GNSS scatter stays windowed to keep the fix cloud
+    readable.
+    """
     log_path = Path(log_path)
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     records = _load_log(log_path)
-    centerline = _load_waypoints(mission_path) if mission_path else []
+    centerline = _load_waypoints(survey_path) if survey_path else []
 
     a_x = [r["rover_a"]["truth"]["x"] for r in records]
     a_y = [r["rover_a"]["truth"]["y"] for r in records]
@@ -180,17 +201,18 @@ def render_cmp_video(
                         bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="#ccc"))
 
     ax.legend(loc="upper right", fontsize=8, framealpha=0.9)
-    ax.set_title("PolarRover CMP Survey Simulation", fontweight="bold")
+    ax.set_title("Nisse CMP Survey Simulation", fontweight="bold")
 
     subsample = max(1, len(records) // (fps * 30))
 
     def update(frame_idx):
         i = min(frame_idx * subsample, len(records) - 1)
-        start = max(0, i - trail_len)
+        window_start = max(0, i - trail_len)
+        path_start = 0 if persistent_path else window_start
 
-        trail_a.set_data(a_x[start:i + 1], a_y[start:i + 1])
-        trail_b.set_data(b_x[start:i + 1], b_y[start:i + 1])
-        trail_mid.set_data(mid_x[start:i + 1], mid_y[start:i + 1])
+        trail_a.set_data(a_x[path_start:i + 1], a_y[path_start:i + 1])
+        trail_b.set_data(b_x[path_start:i + 1], b_y[path_start:i + 1])
+        trail_mid.set_data(mid_x[path_start:i + 1], mid_y[path_start:i + 1])
 
         sa = np.column_stack([a_gx[max(0, i - 50):i + 1], a_gy[max(0, i - 50):i + 1]])
         sb = np.column_stack([b_gx[max(0, i - 50):i + 1], b_gy[max(0, i - 50):i + 1]])
@@ -210,7 +232,7 @@ def render_cmp_video(
 
     n_frames = len(records) // subsample
     anim = FuncAnimation(fig, update, frames=n_frames, interval=1000 // fps, blit=False)
-    writer = FFMpegWriter(fps=fps, metadata={"title": "PolarRover CMP Sim"}, bitrate=2000)
+    writer = FFMpegWriter(fps=fps, metadata={"title": "Nisse CMP Sim"}, bitrate=2000)
     anim.save(str(output_path), writer=writer, dpi=dpi)
     plt.close(fig)
     return output_path

@@ -157,7 +157,7 @@ def _cmd_extract_track(args: list[str]) -> int:
 
 
 def _print_help() -> None:
-    print("rover-sim-emu — PolarRover simulation emulator")
+    print("rover-sim-emu — Nisse simulation emulator")
     print()
     print("Usage: rover-sim-emu <command> [args]")
     print()

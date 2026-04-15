@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ "New Scenario" if is_new else scenario.name }} — PolarRover{% endblock %}
+{% block title %}{{ "New Scenario" if is_new else scenario.name }} — Nisse{% endblock %}
 {% block content %}
 <h1>{{ "New Scenario" if is_new else "Edit: " + scenario.name }}</h1>
 <form id="scenario-form">
@@ -53,7 +53,7 @@
 
     <div style="margin-top:1rem;">
         <button type="submit">{{ "Create" if is_new else "Save" }}</button>
-        {% if not is_new %}<a href="/scenarios/{{ scenario.name }}/mission" style="margin-left:1rem;">Edit Mission Map</a>{% endif %}
+        {% if not is_new %}<a href="/scenarios/{{ scenario.name }}/mission" style="margin-left:1rem;">Edit Survey Map</a>{% endif %}
     </div>
 </form>
 {% endblock %}

@@ -1,9 +1,9 @@
-PACKAGES := rover_sim rover_drive rover_hardware rover_sim_emulator rover_sim_startup
+PACKAGES := rover_sim rover_drive rover_hardware rover_sim_emulator rover_sim_startup rover_field_boot rover_onboard
 
 .PHONY: help install dev test clean lint
 
 help:
-	@echo "PolarRover Software — development targets"
+	@echo "Nisse Software — development targets"
 	@echo ""
 	@echo "  make install   install all four packages in editable mode"
 	@echo "  make dev       install with dev extras (pytest, etc.)"

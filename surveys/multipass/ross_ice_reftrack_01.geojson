@@ -819,8 +819,8 @@
         "name": "ross_ice_multipass_ref",
         "description": "Fused reference track from previous waypoint run",
         "role": "base_track",
-        "mission_kind": "multipass_survey",
-        "mission_version": 1,
+        "survey_kind": "multipass_survey",
+        "survey_version": 1,
         "epsg": 3031,
         "n_points": 200,
         "params": {

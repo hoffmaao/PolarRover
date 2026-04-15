@@ -2,11 +2,11 @@
 
 The simulator lets us develop, and validate the autonomous drive code for the MTT-154. A scenario file specifies the vehicle configuration, the controller, and the mission; the emulator runs it forward in time with the kinematic model for the rover, a simulated GNSS receiver, and writes a JSONL telemetry log.
 
-The Python code that drives simulation lives under `../Software/` in the `rover_sim`, `rover_drive`, and `rover_sim_emulator` packages. This directory holds the inputs and outputs.
+The Python code that drives simulation lives under `../Software/` in the `rover_sim`, `rover_drive`, and `rover_sim_emulator` packages. This directory holds the outputs of simulation runs — telemetry logs, figures, and rendered videos. Surveys themselves live at the repo root under `../surveys/`, where the field rover reads them too, so a survey authored for a deployment also runs unchanged in simulation.
 
-## Example missions
+## Surveys
 
-The `examples/` directory contains mission files in GeoJSON format. Coordinates are in EPSG:3031, the Antarctic Polar Stereographic projection. `waypoint_mission.geojson` is a sparse six-point S-curve. `multipass_reftrack.geojson` is a dense reference track for repeat-pass radar surveys; the corresponding controller minimizes cross-track RMS against it. `cmp_mission.geojson` defines a fixed midpoint and a spreading direction for a two-rover Common Midpoint survey.
+Reference [`../surveys/`](../surveys/) for the library of pre-authored surveys used by both the simulator and the field rover. The folder is organized by survey kind (waypoint, multipass, CMP, calibration). The simulator loads these directly via the `survey_path` field in a scenario config.
 
 ## Generated outputs
 

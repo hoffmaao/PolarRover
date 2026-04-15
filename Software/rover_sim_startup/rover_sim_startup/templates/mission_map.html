@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Mission Map: {{ scenario.name }} — PolarRover{% endblock %}
+{% block title %}Survey Map: {{ scenario.name }} — Nisse{% endblock %}
 {% block content %}
-<h1>Mission Map: {{ scenario.name }}</h1>
+<h1>Survey Map: {{ scenario.name }}</h1>
 <p>Controller: <code>{{ scenario.controller.kind }}</code></p>
 
 <div class="map-controls">
-    <label>Mission kind:
+    <label>Survey kind:
         <select id="mission-kind">
             <option value="waypoint_survey">Waypoint Survey</option>
             <option value="multipass_survey">Multipass Survey</option>
@@ -63,7 +63,7 @@ function buildGeoJSON() {
     });
     return {
         type: "FeatureCollection",
-        properties: {mission_kind: kind, mission_version: 1, params: {}},
+        properties: {survey_kind: kind, survey_version: 1, params: {}},
         features: features
     };
 }
@@ -88,7 +88,7 @@ document.getElementById("btn-upload").addEventListener("click", async function()
     const fd = new FormData();
     fd.append("file", blob, "{{ scenario.name }}_mission.geojson");
     const resp = await fetch("/api/scenarios/{{ scenario.name }}/mission", {method: "POST", body: fd});
-    document.getElementById("status").textContent = resp.ok ? "Mission uploaded to scenario." : "Upload failed.";
+    document.getElementById("status").textContent = resp.ok ? "Survey uploaded to scenario." : "Upload failed.";
 });
 </script>
 {% endblock %}

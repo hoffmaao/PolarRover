@@ -12,7 +12,11 @@ The drive software is organized into four packages that separate simulation infr
 
 `rover_sim_emulator` is the batch test harness. It steps the vehicle model forward in time, samples the GNSS sensor, calls the active driver, applies the safety filter, and writes JSONL telemetry. A CLI provides `run`, `demo`, and `extract-track` commands.
 
-`rover_sim_startup` is a lightweight FastAPI web application for creating missions and inspecting telemetry logs. Everything is file-based — no database — because the rover operates disconnected in the field.
+`rover_sim_startup` is a lightweight FastAPI web application for creating surveys and inspecting telemetry logs. Everything is file-based — no database — because the rover operates disconnected in the field.
+
+`rover_field_boot` is the Jetson-side boot loader. It looks for a survey card at a known mount point, falls back to the local disk surveys folder, lets an operator pick a survey (or reads an `active.txt` selector for unattended operation), and dispatches the matching drive mode. Systemd unit files and an install script live under `rover_field_boot/deploy/`.
+
+`rover_onboard` is the platform layer that sits between the Jetson OS and the autonomy stack. It owns the status broker that connects the drive loop to any operator-facing view of the rover, plus the OLED boot display, the audio/TTS callout layer, the vision pipeline (OAK-D Pro capture and feature segmentation), and a FastAPI web UI that serves live video plus a real-time state panel. Hardware-dependent backends (OLED, TTS, depthai, Flask) are optional extras so the package is still fully importable and testable on a laptop.
 
 ## Controllers
 
@@ -35,3 +39,12 @@ make dev    # editable install of all packages with dev extras
 make test   # pytest across all packages
 make clean  # remove build artifacts
 ```
+
+## Deployment on the MTT Jetson
+
+`rover_field_boot/deploy/install.sh` installs the whole stack under `/opt/nisse/` on a Jetson, creates a `nisse` system user, drops the two systemd units into place, and enables them. The boot sequence after install is:
+
+1. `rover-onboard.service` starts after network-online, brings up the status broker, OLED display, audio callouts, and the web UI on port 5000.
+2. `rover-field-boot.service` starts after `rover-onboard`, looks for a survey card at `/media/nisse/NISSE/surveys/active.txt`, falls back to `/opt/nisse/surveys/` on disk, and either dispatches the selected survey or exits cleanly so the rover sits in teleop-ready state.
+
+The web UI is the operator's primary interface in the field — an operator joins the rover's WiFi AP fallback, opens `http://<rover-ip>:5000/`, and sees a live OAK-D feed alongside a real-time rover-state panel driven by the StatusBroker.

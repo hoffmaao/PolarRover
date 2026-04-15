@@ -69,7 +69,7 @@ async def api_upload_mission(request: Request, name: str, file: UploadFile = Fil
     path = save_mission(sdir, name, content)
     try:
         cfg = load_scenario(sdir, name)
-        cfg.mission_path = str(path)
+        cfg.survey_path = str(path)
         save_scenario(sdir, cfg)
     except FileNotFoundError:
         pass

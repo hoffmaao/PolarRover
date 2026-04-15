@@ -24,7 +24,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from rover_sim.missions import Waypoint
+from rover_sim.surveys import Waypoint
 from rover_drive.controllers.base import ControlOutput, PathController
 
 

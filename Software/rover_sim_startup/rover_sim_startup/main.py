@@ -1,4 +1,4 @@
-"""FastAPI application factory for the PolarRover mission startup web app."""
+"""FastAPI application factory for the Nisse mission startup web app."""
 
 from pathlib import Path
 from typing import Optional
@@ -9,7 +9,7 @@ from fastapi.templating import Jinja2Templates
 
 
 def create_app(scenarios_dir: Optional[Path] = None) -> FastAPI:
-    app = FastAPI(title="PolarRover Mission Startup")
+    app = FastAPI(title="Nisse Survey Startup")
 
     pkg_dir = Path(__file__).parent
     app.mount("/static", StaticFiles(directory=pkg_dir / "static"), name="static")

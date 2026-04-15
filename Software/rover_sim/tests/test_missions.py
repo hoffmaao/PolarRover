@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from rover_sim.missions import Mission, MissionKind, Waypoint, from_geojson_dict, load_mission
+from rover_sim.surveys import Survey, SurveyKind, Waypoint, from_geojson_dict, load_survey
 
 
 _CRS_3031 = {"type": "name", "properties": {"name": "urn:ogc:def:crs:EPSG::3031"}}
@@ -14,8 +14,8 @@ def _waypoint_doc() -> dict:
         "type": "FeatureCollection",
         "crs": _CRS_3031,
         "properties": {
-            "mission_kind": "waypoint_survey",
-            "mission_version": 1,
+            "survey_kind": "waypoint_survey",
+            "survey_version": 1,
             "params": {"speed_target_mps": 1.0, "waypoint_tolerance_m": 1.0},
         },
         "features": [
@@ -25,7 +25,7 @@ def _waypoint_doc() -> dict:
                     "type": "LineString",
                     "coordinates": [[-250000, 500000], [-249900, 500000], [-249800, 500000]],
                 },
-                "properties": {"role": "path", "mission_kind": "waypoint_survey"},
+                "properties": {"role": "path", "survey_kind": "waypoint_survey"},
             }
         ],
     }
@@ -36,8 +36,8 @@ def _multipass_doc(n_passes: int, direction: str = "alternating") -> dict:
         "type": "FeatureCollection",
         "crs": _CRS_3031,
         "properties": {
-            "mission_kind": "multipass_survey",
-            "mission_version": 1,
+            "survey_kind": "multipass_survey",
+            "survey_version": 1,
             "params": {
                 "n_passes": n_passes,
                 "pass_direction": direction,
@@ -51,7 +51,7 @@ def _multipass_doc(n_passes: int, direction: str = "alternating") -> dict:
                     "type": "LineString",
                     "coordinates": [[-250000, 500000], [-249999, 500000], [-249998, 500000]],
                 },
-                "properties": {"role": "base_track", "mission_kind": "multipass_survey"},
+                "properties": {"role": "base_track", "survey_kind": "multipass_survey"},
             }
         ],
     }
@@ -62,8 +62,8 @@ def _cmp_doc() -> dict:
         "type": "FeatureCollection",
         "crs": _CRS_3031,
         "properties": {
-            "mission_kind": "cmp_survey",
-            "mission_version": 1,
+            "survey_kind": "cmp_survey",
+            "survey_version": 1,
             "params": {
                 "spread_mode": "constant",
                 "start_spread_m": 30.0,
@@ -78,7 +78,7 @@ def _cmp_doc() -> dict:
                     "type": "LineString",
                     "coordinates": [[-250000, 500000], [-249900, 500000]],
                 },
-                "properties": {"role": "centerline", "mission_kind": "cmp_survey"},
+                "properties": {"role": "centerline", "survey_kind": "cmp_survey"},
             }
         ],
     }
@@ -86,7 +86,7 @@ def _cmp_doc() -> dict:
 
 def test_waypoint_loader():
     m = from_geojson_dict(_waypoint_doc())
-    assert m.kind is MissionKind.WAYPOINT
+    assert m.kind is SurveyKind.WAYPOINT
     assert len(m.waypoints) == 3
     assert m.waypoints[0] == Waypoint(x=-250000, y=500000)
     assert m.params["speed_target_mps"] == 1.0
@@ -94,7 +94,7 @@ def test_waypoint_loader():
 
 def test_multipass_alternating_reverses_odd_passes():
     m = from_geojson_dict(_multipass_doc(n_passes=2, direction="alternating"))
-    assert m.kind is MissionKind.MULTIPASS
+    assert m.kind is SurveyKind.MULTIPASS
     assert len(m.waypoints) == 6
     assert [w.x for w in m.waypoints[:3]] == [-250000, -249999, -249998]
     assert [w.x for w in m.waypoints[3:]] == [-249998, -249999, -250000]
@@ -115,7 +115,7 @@ def test_multipass_single_pass_passthrough():
 
 def test_cmp_loader_keeps_centerline_only():
     m = from_geojson_dict(_cmp_doc())
-    assert m.kind is MissionKind.CMP
+    assert m.kind is SurveyKind.CMP
     assert len(m.waypoints) == 2
     assert m.params["start_spread_m"] == 30.0
     assert m.params["baseline"] == "perpendicular_to_tangent"
@@ -123,17 +123,17 @@ def test_cmp_loader_keeps_centerline_only():
 
 def test_unknown_mission_kind_raises():
     doc = _waypoint_doc()
-    doc["properties"]["mission_kind"] = "bogus_survey"
-    doc["features"][0]["properties"]["mission_kind"] = "bogus_survey"
-    with pytest.raises(ValueError, match="unknown mission_kind"):
+    doc["properties"]["survey_kind"] = "bogus_survey"
+    doc["features"][0]["properties"]["survey_kind"] = "bogus_survey"
+    with pytest.raises(ValueError, match="unknown survey_kind"):
         from_geojson_dict(doc)
 
 
 def test_missing_mission_kind_raises():
     doc = _waypoint_doc()
-    del doc["properties"]["mission_kind"]
-    del doc["features"][0]["properties"]["mission_kind"]
-    with pytest.raises(ValueError, match="mission_kind"):
+    del doc["properties"]["survey_kind"]
+    del doc["features"][0]["properties"]["survey_kind"]
+    with pytest.raises(ValueError, match="survey_kind"):
         from_geojson_dict(doc)
 
 
@@ -156,7 +156,7 @@ def test_role_hint_prefers_matching_feature():
         {
             "type": "Feature",
             "geometry": {"type": "LineString", "coordinates": [[-300000, 600000]]},
-            "properties": {"role": "distractor", "mission_kind": "waypoint_survey"},
+            "properties": {"role": "distractor", "survey_kind": "waypoint_survey"},
         },
     )
     m = from_geojson_dict(doc)
@@ -166,8 +166,8 @@ def test_role_hint_prefers_matching_feature():
 def test_load_mission_from_disk(tmp_path: Path):
     f = tmp_path / "mission.geojson"
     f.write_text(json.dumps(_waypoint_doc()))
-    m = load_mission(f)
-    assert m.kind is MissionKind.WAYPOINT
+    m = load_survey(f)
+    assert m.kind is SurveyKind.WAYPOINT
     assert len(m.waypoints) == 3
 
 
@@ -184,7 +184,7 @@ def test_latlon_coordinates_without_crs_rejected():
         "features": [{
             "type": "Feature",
             "geometry": {"type": "LineString", "coordinates": [[166.67, -77.85], [166.68, -77.85]]},
-            "properties": {"role": "path", "mission_kind": "waypoint_survey"},
+            "properties": {"role": "path", "survey_kind": "waypoint_survey"},
         }],
     }
     with pytest.raises(ValueError, match="WGS84 lat/lon"):

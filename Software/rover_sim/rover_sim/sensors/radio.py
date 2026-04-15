@@ -8,7 +8,7 @@ from typing import Any, Optional
 class RadioLinkConfig:
     """
     Parameterized radio link model. Default profile is **WiFi LAN**, matching
-    the PolarRover CMP topology where a stationary central base station
+    the Nisse CMP topology where a stationary central base station
     (sitting at the common midpoint of a CMP shot) broadcasts RTK corrections
     and coordination messages to both rovers over 2.4 / 5 GHz WiFi.
 
@@ -74,7 +74,7 @@ class RadioLink:
     max payload size. Does NOT model RF physics, range, or terrain — those can
     be layered on later via pre-send hooks if needed.
 
-    For the PolarRover CMP star topology, instantiate two RadioLink objects
+    For the Nisse CMP star topology, instantiate two RadioLink objects
     side by side: one for base↔rover_A and one for base↔rover_B. The linked
     CMP controller (Phase 6) runs on the base station and treats each link
     independently. If we ever need true one-to-many broadcast semantics, a

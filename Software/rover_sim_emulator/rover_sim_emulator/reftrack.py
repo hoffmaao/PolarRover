@@ -22,7 +22,7 @@ def extract_reference_track(
     source: str = "fused",
     min_speed_mps: float = 0.1,
     spacing_m: float = 0.5,
-    mission_kind: str = "multipass_survey",
+    survey_kind: str = "multipass_survey",
 ) -> Path:
     """
     Read a JSONL telemetry log and extract a densely sampled reference track
@@ -39,7 +39,7 @@ def extract_reference_track(
     min_speed_mps : exclude points where the rover was slower than this
         (filters out the startup and braking phases)
     spacing_m : resample the track to approximately this spacing in meters
-    mission_kind : the ``mission_kind`` tag for the output GeoJSON
+    survey_kind : the ``survey_kind`` tag for the output GeoJSON
         (``"multipass_survey"`` by default)
 
     Returns
@@ -73,7 +73,7 @@ def extract_reference_track(
                 },
                 "properties": {
                     "role": "base_track",
-                    "mission_kind": mission_kind,
+                    "survey_kind": survey_kind,
                     "source_log": str(log_path.name),
                     "source_stream": source,
                     "spacing_m": spacing_m,

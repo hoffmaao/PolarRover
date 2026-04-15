@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from rover_sim.control import FixType, RoverState
-from rover_sim.missions import Mission, MissionKind, Waypoint
+from rover_sim.surveys import Survey, SurveyKind, Waypoint
 
 from rover_drive.estimation import EnKFConfig, EnsembleKalmanFilter
 from rover_drive.modes.multipass import (
@@ -18,12 +18,12 @@ def _line_mission(
     start: tuple[float, float],
     end: tuple[float, float],
     n_points: int = 50,
-) -> Mission:
+) -> Survey:
     """Create a densely sampled straight-line mission in ENU meters."""
     xs = np.linspace(start[0], end[0], n_points)
     ys = np.linspace(start[1], end[1], n_points)
     wps = [Waypoint(x=float(x), y=float(y)) for x, y in zip(xs, ys)]
-    return Mission(kind=MissionKind.MULTIPASS, waypoints=wps)
+    return Survey(kind=SurveyKind.MULTIPASS, waypoints=wps)
 
 
 def _state(
@@ -56,7 +56,7 @@ def test_missing_mission_raises():
 
 def test_empty_mission_raises():
     d = _seeded_driver()
-    m = Mission(kind=MissionKind.MULTIPASS, waypoints=[])
+    m = Survey(kind=SurveyKind.MULTIPASS, waypoints=[])
     with pytest.raises(RuntimeError, match="non-empty"):
         d.update(_state(), m, dt=0.05)
 
@@ -143,7 +143,7 @@ def test_lookahead_steers_toward_path_not_just_nearest():
         [Waypoint(x=float(x), y=0.0) for x in np.linspace(0, 10, 50)]
         + [Waypoint(x=10.0, y=float(y)) for y in np.linspace(0, 10, 50)]
     )
-    m = Mission(kind=MissionKind.MULTIPASS, waypoints=wps)
+    m = Survey(kind=SurveyKind.MULTIPASS, waypoints=wps)
     d = _seeded_driver(lookahead_m=3.0)
 
     # Position the rover near the bend, heading east

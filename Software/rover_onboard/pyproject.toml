@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "rover_onboard"
+version = "0.0.1"
+description = "Nisse onboard platform utilities — status broker, OLED display, audio/TTS, vision, and Flask/FastAPI web UI for the MTT Jetson"
+requires-python = ">=3.10"
+authors = [{ name = "hoffmaao" }]
+dependencies = [
+    "rover_sim",
+]
+
+[project.optional-dependencies]
+audio = ["pyttsx3>=2.90"]
+display = ["luma.oled>=3.13"]
+vision = ["depthai>=2.24", "opencv-python>=4.8", "numpy>=1.24"]
+web = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "jinja2>=3.1"]
+wifi = []
+all = [
+    "rover_onboard[audio]",
+    "rover_onboard[display]",
+    "rover_onboard[vision]",
+    "rover_onboard[web]",
+]
+dev = ["pytest>=7.0", "pytest-cov>=4.0"]
+
+[project.scripts]
+rover-onboard = "rover_onboard.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["rover_onboard"]

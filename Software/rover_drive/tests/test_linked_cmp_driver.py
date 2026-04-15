@@ -4,17 +4,17 @@ import numpy as np
 import pytest
 
 from rover_sim.control import FixType, RoverState
-from rover_sim.missions import Mission, MissionKind, Waypoint
+from rover_sim.surveys import Survey, SurveyKind, Waypoint
 
 from rover_drive.estimation import EnKFConfig, EnsembleKalmanFilter
 from rover_drive.modes.linked_cmp import CMPFormationConfig, CMPMetrics, LinkedCMPDriver
 
 
 def _cmp_mission(midpoint: tuple[float, float] = (0, 0),
-                 direction: tuple[float, float] = (1, 0)) -> Mission:
-    """Mission with midpoint at wp[0] and survey direction toward wp[1]."""
-    return Mission(
-        kind=MissionKind.CMP,
+                 direction: tuple[float, float] = (1, 0)) -> Survey:
+    """Survey with midpoint at wp[0] and survey direction toward wp[1]."""
+    return Survey(
+        kind=SurveyKind.CMP,
         waypoints=[
             Waypoint(x=midpoint[0], y=midpoint[1]),
             Waypoint(x=midpoint[0] + direction[0] * 50, y=midpoint[1] + direction[1] * 50),
@@ -40,7 +40,7 @@ def _make_driver(start=2.0, end=20.0, rate=1.0, **kw) -> LinkedCMPDriver:
 
 def test_needs_at_least_two_waypoints():
     d = _make_driver()
-    m = Mission(kind=MissionKind.CMP, waypoints=[Waypoint(x=0, y=0)])
+    m = Survey(kind=SurveyKind.CMP, waypoints=[Waypoint(x=0, y=0)])
     with pytest.raises(RuntimeError, match="2 waypoints"):
         d.update(_state(), _state(), m, dt=0.05)
 

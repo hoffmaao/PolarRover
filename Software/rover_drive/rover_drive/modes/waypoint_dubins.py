@@ -14,7 +14,7 @@ from typing import Optional
 import numpy as np
 
 from rover_sim.control import CommandBus, DirectionMode, FixType, RoverState
-from rover_sim.missions import Mission, Waypoint
+from rover_sim.surveys import Survey, Waypoint
 
 from rover_drive.estimation import (
     STATE_HEADING, STATE_SPEED, STATE_X, STATE_Y,
@@ -73,7 +73,7 @@ class DubinsWaypointDriver:
         self._initialized = False; self._last_obs_t = -math.inf
         self._last_cmd = None; self._planned = False; self.enkf.reset()
 
-    def update(self, state: RoverState, mission: Optional[Mission], dt: float) -> CommandBus:
+    def update(self, state: RoverState, mission: Optional[Survey], dt: float) -> CommandBus:
         if mission is None or not mission.waypoints:
             raise RuntimeError("DubinsWaypointDriver requires a non-empty mission")
         self._step_filter(state, dt)
@@ -88,7 +88,7 @@ class DubinsWaypointDriver:
 
     # ---------- path planning with proper continuity ----------
 
-    def _plan_path(self, start_pose: tuple[float, float, float], mission: Mission) -> None:
+    def _plan_path(self, start_pose: tuple[float, float, float], mission: Survey) -> None:
         cfg = self.config
         wps = mission.waypoints
         mode = mission.params.get("approach_mode", cfg.approach_mode)

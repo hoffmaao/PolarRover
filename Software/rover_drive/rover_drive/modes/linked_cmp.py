@@ -18,7 +18,7 @@ from typing import Optional
 import numpy as np
 
 from rover_sim.control import CommandBus, DirectionMode, FixType, RoverState
-from rover_sim.missions import Mission, Waypoint
+from rover_sim.surveys import Survey, Waypoint
 
 from rover_drive.estimation import (
     STATE_HEADING,
@@ -154,7 +154,7 @@ class LinkedCMPDriver:
         self,
         state_a: RoverState,
         state_b: RoverState,
-        mission: Mission,
+        mission: Survey,
         dt: float,
     ) -> tuple[CommandBus, CommandBus]:
         if len(mission.waypoints) < 2:
@@ -182,7 +182,7 @@ class LinkedCMPDriver:
 
     # ---------- setup ----------
 
-    def _setup_geometry(self, mission: Mission) -> None:
+    def _setup_geometry(self, mission: Survey) -> None:
         wp0 = mission.waypoints[0]
         wp1 = mission.waypoints[1]
         self._midpoint = (wp0.x, wp0.y)

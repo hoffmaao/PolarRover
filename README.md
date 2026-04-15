@@ -1,6 +1,6 @@
-# PolarRover
+# Nisse
 
-PolarRover is the software and hardware designs for two autonomous rovers built at LDEO, University of Kansas and Rice University for polar field science. The vehicles are MTT-154 articulated traction units fitted with dual-band GNSS, towed radar sleds, and onboard computing for linked autonomous surveying. These systems can be used to collect conventional radar data while enabling measurements like coordinated Common Midpoint surveys that require linked autonomy and precise positioning.
+Nisse is the software and hardware designs for two autonomous rovers built at LDEO, University of Kansas and Rice University for polar field science. The vehicles are MTT-154 articulated traction units fitted with dual-band GNSS, towed radar sleds, and onboard computing for linked autonomous surveying. These systems can be used to collect conventional radar data while enabling measurements like coordinated Common Midpoint surveys that require linked autonomy and precise positioning.
 
 This project is supported by the OTIC Paros fund.
 
@@ -12,7 +12,7 @@ An autonomous platform can reduce these barriers and run pre-loaded surveys over
 
 ## Software
 
-The drive software lives under `Software/` and is split into four Python packages. `rover_sim` includes kinematic vehicle models, a GNSS sensor simulator, safety interlocks, and mission file handling. `rover_drive` builds on this module with autonomous drive modes, path-following controllers, an Ensemble Kalman Filter for state estimation, and Dubins path planning. `rover_sim_emulator` ties these modules together in a batch test harness with telemetry logging and animation. `rover_sim_startup` is a small FastAPI app for authoring missions and viewing logs offline.
+The drive software lives under `Software/` and is split into seven Python packages. `rover_sim` includes kinematic vehicle models, a GNSS sensor simulator, safety interlocks, and survey file handling. `rover_drive` builds on this module with autonomous drive modes, path-following controllers, an Ensemble Kalman Filter for state estimation, and Dubins path planning. `rover_hardware` is the CAN bridge that carries CommandBus output to the MTT ECU. `rover_sim_emulator` ties the sim modules together in a batch test harness with telemetry logging and animation. `rover_sim_startup` is a small FastAPI app for authoring surveys and viewing logs offline. `rover_field_boot` is the Jetson boot loader that reads a survey from a removable card or local disk and dispatches the matching drive mode. `rover_onboard` is the platform layer on the Jetson that runs the OLED display, audio callouts, vision pipeline, and the operator web UI that serves live video plus a real-time rover-state panel.
 
 See [Software/README.md](Software/README.md) for details on the control architecture.
 
@@ -32,7 +32,7 @@ rover-sim-emu demo multipass
 rover-sim-emu demo cmp
 ```
 
-Example mission files in `Simulator/examples/` show the GeoJSON format for waypoint surveys, repeat-track radar lines, and two-rover CMP spreads. All coordinates are in EPSG:3031 (Antarctic Polar Stereographic).
+Example survey files in `surveys/` show the GeoJSON format for waypoint navigation, repeat-track radar lines, and two-rover CMP spreads, organized into one subfolder per survey kind. All coordinates are in EPSG:3031 (Antarctic Polar Stereographic).
 
 ## Hardware
 
@@ -40,7 +40,7 @@ The vehicle is an MTT-154 single-track articulated traction unit with a rate-com
 
 ## Repository layout
 
-`Electrical/`, `Instruments/`, and `Mechanical/` contain subsystem documentation and specifications. `Software/` has the full drive stack. `Simulator/` holds example missions, generated telemetry, and rendered outputs. `Testing/` has the bench test director — the campaign that takes the system from working in simulation to working on the MTT.
+`Electrical/`, `Instruments/`, and `Mechanical/` contain subsystem documentation and specifications. `Software/` has the full drive stack. `surveys/` is the shared library of pre-authored surveys used by both the simulator and the field rover. `Simulator/` holds generated telemetry, figures, and rendered videos. `Testing/` has the bench test director — the campaign that takes the system from working in simulation to working on the MTT.
 
 ## License
 

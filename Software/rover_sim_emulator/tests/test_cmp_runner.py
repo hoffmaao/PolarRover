@@ -17,15 +17,15 @@ def _write_cmp_mission(path: Path, midpoint=(0.0, 0.0), direction=(1.0, 0.0)) ->
         "features": [{
             "type": "Feature",
             "geometry": {"type": "LineString", "coordinates": [list(midpoint), list(end)]},
-            "properties": {"role": "centerline", "mission_kind": "cmp_survey"},
+            "properties": {"role": "centerline", "survey_kind": "cmp_survey"},
         }],
     }
     path.write_text(json.dumps(data))
 
 
 def test_cmp_rovers_spread_outward(tmp_path: Path):
-    mission_path = tmp_path / "cmp.geojson"
-    _write_cmp_mission(mission_path)
+    survey_path = tmp_path / "cmp.geojson"
+    _write_cmp_mission(survey_path)
 
     cfg = ScenarioConfig(
         name="cmp_spread_test",
@@ -33,7 +33,7 @@ def test_cmp_rovers_spread_outward(tmp_path: Path):
         duration_s=40.0,
         dt_s=0.05,
         log_path=str(tmp_path / "cmp.jsonl"),
-        mission_path=str(mission_path),
+        survey_path=str(survey_path),
         controller=ControllerConfig(
             kind="linked_cmp",
             params={
@@ -71,8 +71,8 @@ def test_cmp_rovers_spread_outward(tmp_path: Path):
 
 
 def test_initial_poses_along_survey_axis(tmp_path: Path):
-    mission_path = tmp_path / "cmp.geojson"
-    _write_cmp_mission(mission_path, midpoint=(10, 5), direction=(1, 0))
+    survey_path = tmp_path / "cmp.geojson"
+    _write_cmp_mission(survey_path, midpoint=(10, 5), direction=(1, 0))
 
     cfg = ScenarioConfig(
         name="pose_check",
@@ -80,7 +80,7 @@ def test_initial_poses_along_survey_axis(tmp_path: Path):
         duration_s=0.1,
         dt_s=0.05,
         log_path=str(tmp_path / "check.jsonl"),
-        mission_path=str(mission_path),
+        survey_path=str(survey_path),
         controller=ControllerConfig(
             kind="linked_cmp",
             params={"start_spread_m": 4.0, "enkf_seed": 1},
@@ -107,18 +107,18 @@ def test_missing_mission_raises(tmp_path: Path):
         log_path=str(tmp_path / "out.jsonl"),
         controller=ControllerConfig(kind="linked_cmp"),
     )
-    with pytest.raises(ValueError, match="mission_path"):
+    with pytest.raises(ValueError, match="survey_path"):
         LinkedCMPRunner(cfg)
 
 
 def test_dispatch_routes_to_cmp_runner(tmp_path: Path):
-    mission_path = tmp_path / "cmp.geojson"
-    _write_cmp_mission(mission_path)
+    survey_path = tmp_path / "cmp.geojson"
+    _write_cmp_mission(survey_path)
 
     cfg = ScenarioConfig(
         name="dispatch_test", seed=0, duration_s=2.0, dt_s=0.05,
         log_path=str(tmp_path / "dispatch.jsonl"),
-        mission_path=str(mission_path),
+        survey_path=str(survey_path),
         controller=ControllerConfig(
             kind="linked_cmp",
             params={"start_spread_m": 2.0, "end_spread_m": 4.0, "enkf_seed": 0},

@@ -133,7 +133,7 @@ def _write_waypoint_mission(path: Path, *coords: tuple[float, float]) -> None:
             {
                 "type": "Feature",
                 "geometry": {"type": "LineString", "coordinates": [list(c) for c in coords]},
-                "properties": {"role": "path", "mission_kind": "waypoint_survey"},
+                "properties": {"role": "path", "survey_kind": "waypoint_survey"},
             }
         ],
     }
@@ -141,8 +141,8 @@ def _write_waypoint_mission(path: Path, *coords: tuple[float, float]) -> None:
 
 
 def test_waypoint_scenario_reaches_all_waypoints(tmp_path: Path):
-    mission_path = tmp_path / "mission.geojson"
-    _write_waypoint_mission(mission_path, (5.0, 0.0), (10.0, 5.0), (15.0, 0.0))
+    survey_path = tmp_path / "mission.geojson"
+    _write_waypoint_mission(survey_path, (5.0, 0.0), (10.0, 5.0), (15.0, 0.0))
 
     cfg = ScenarioConfig(
         name="waypoint_e2e",
@@ -150,7 +150,7 @@ def test_waypoint_scenario_reaches_all_waypoints(tmp_path: Path):
         duration_s=90.0,
         dt_s=0.05,
         log_path=str(tmp_path / "waypoint.jsonl"),
-        mission_path=str(mission_path),
+        survey_path=str(survey_path),
         controller=ControllerConfig(
             kind="waypoint",
             params={
@@ -175,15 +175,15 @@ def test_waypoint_scenario_reaches_all_waypoints(tmp_path: Path):
 
 
 def test_multipass_scenario_reports_cross_track(tmp_path: Path):
-    mission_path = tmp_path / "multipass.geojson"
-    _write_waypoint_mission(mission_path, *[(float(x), 0.0) for x in range(0, 25)])
+    survey_path = tmp_path / "multipass.geojson"
+    _write_waypoint_mission(survey_path, *[(float(x), 0.0) for x in range(0, 25)])
     # Re-tag as multipass
     import json as _json
 
-    data = _json.loads(mission_path.read_text())
+    data = _json.loads(survey_path.read_text())
     data["features"][0]["properties"]["role"] = "base_track"
-    data["features"][0]["properties"]["mission_kind"] = "multipass_survey"
-    mission_path.write_text(_json.dumps(data))
+    data["features"][0]["properties"]["survey_kind"] = "multipass_survey"
+    survey_path.write_text(_json.dumps(data))
 
     cfg = ScenarioConfig(
         name="multipass_e2e",
@@ -191,7 +191,7 @@ def test_multipass_scenario_reports_cross_track(tmp_path: Path):
         duration_s=60.0,
         dt_s=0.05,
         log_path=str(tmp_path / "multipass.jsonl"),
-        mission_path=str(mission_path),
+        survey_path=str(survey_path),
         controller=ControllerConfig(
             kind="multipass",
             params={
@@ -216,10 +216,10 @@ def test_waypoint_without_mission_raises(tmp_path: Path):
         duration_s=1.0,
         dt_s=0.05,
         log_path=str(tmp_path / "no_mission.jsonl"),
-        # mission_path not set
+        # survey_path not set
         controller=ControllerConfig(kind="waypoint", params={}),
     )
-    with pytest.raises(ValueError, match="mission_path"):
+    with pytest.raises(ValueError, match="survey_path"):
         ScenarioRunner(cfg)
 
 

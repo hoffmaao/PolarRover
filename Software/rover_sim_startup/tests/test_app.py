@@ -78,7 +78,7 @@ def test_mission_upload(client, tmp_path: Path):
 
     geojson = {
         "type": "FeatureCollection",
-        "properties": {"mission_kind": "waypoint_survey", "params": {}},
+        "properties": {"survey_kind": "waypoint_survey", "params": {}},
         "features": [
             {
                 "type": "Feature",

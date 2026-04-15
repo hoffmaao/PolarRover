@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "rover_sim"
 version = "0.0.1"
-description = "Kinematic rover simulator and shared interfaces for the PolarRover drive stack"
+description = "Kinematic rover simulator and shared interfaces for the Nisse drive stack"
 requires-python = ">=3.10"
 authors = [{ name = "hoffmaao" }]
 dependencies = [

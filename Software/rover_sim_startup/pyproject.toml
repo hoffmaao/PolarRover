@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "rover_sim_startup"
 version = "0.0.1"
-description = "PolarRover mission authoring and log viewing web app (offline, file-based)"
+description = "Nisse mission authoring and log viewing web app (offline, file-based)"
 requires-python = ">=3.10"
 authors = [{ name = "hoffmaao" }]
 dependencies = [

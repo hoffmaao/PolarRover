@@ -8,7 +8,7 @@ from typing import Optional
 import numpy as np
 
 from rover_sim.control import CommandBus, DirectionMode, FixType, RoverState
-from rover_sim.missions import Mission
+from rover_sim.surveys import Survey
 
 from rover_drive.estimation import (
     STATE_HEADING,
@@ -132,7 +132,7 @@ class CalibrationDriver:
     def update(
         self,
         state: RoverState,
-        mission: Optional[Mission],
+        mission: Optional[Survey],
         dt: float,
     ) -> CommandBus:
         self._step_filter(state, dt)

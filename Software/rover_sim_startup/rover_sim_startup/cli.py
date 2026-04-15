@@ -43,7 +43,7 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     local_ip = _get_local_ip()
     print()
-    print("  PolarRover Mission Startup")
+    print("  Nisse Survey Startup")
     print(f"  Local:   http://localhost:{port}")
     if host == "0.0.0.0" and local_ip:
         print(f"  Network: http://{local_ip}:{port}")
@@ -65,7 +65,7 @@ def _get_local_ip() -> Optional[str]:
 
 
 def _print_help() -> None:
-    print("rover-sim-startup — PolarRover mission authoring web app")
+    print("rover-sim-startup — Nisse mission authoring web app")
     print()
     print("Usage: rover-sim-startup [options]")
     print()
