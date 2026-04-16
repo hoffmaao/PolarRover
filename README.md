@@ -1,18 +1,17 @@
 # Nisse
 
-Nisse is the software and hardware designs for two autonomous rovers built at LDEO, University of Kansas and Rice University for polar field science. The vehicles are MTT-154 articulated traction units fitted with dual-band GNSS, towed radar sleds, and onboard computing for linked autonomous surveying. These systems can be used to collect conventional radar data while enabling measurements like coordinated Common Midpoint surveys that require linked autonomy and precise positioning.
+Nisse in danish/norweigan translates to gnome. Gnomes are helpful magical creatures that can also be mischevious making nisse-en and nisse-to the perfect names for two autonomous rovers we have developed for polar radioglaciolgical science. These systems can be used to collect conventional radar data or linked to enable multistatic surveys.
 
-This project is supported by the OTIC Paros fund.
 
 ## Why rovers
 
-Polar environments are some of the most logistically challenging and expensive research sites on Earth. For every dollar NSF spends on Antarctic science, roughly two go to logistics. The work is physically demanding, which limits who can participate and how much ground a team can cover in a season. Hazards and access barriers lead to critical data gaps, reducing the reproducibility and spatial reach of field measurements.
+Polar environments are some of the most logistically challenging research sites to maintain on Earth. The work is physically demanding, which limits who can participate and how much ground-based teams can accomplish in a season. Hazards and access barriers lead to critical data gaps, reducing the reproducibility and spatial reach of field measurements.
 
 An autonomous platform can reduce these barriers and run pre-loaded surveys overnight, repeat radar aquisitions at centimeter precision, and spread two vehicles symmetrically about a midpoint for CMP shots, experiments that are tedious or dangerous to conduct manually.
 
 ## Software
 
-The drive software lives under `Software/` and is split into seven Python packages. `rover_sim` includes kinematic vehicle models, a GNSS sensor simulator, safety interlocks, and survey file handling. `rover_drive` builds on this module with autonomous drive modes, path-following controllers, an Ensemble Kalman Filter for state estimation, and Dubins path planning. `rover_hardware` is the CAN bridge that carries CommandBus output to the MTT ECU. `rover_sim_emulator` ties the sim modules together in a batch test harness with telemetry logging and animation. `rover_sim_startup` is a small FastAPI app for authoring surveys and viewing logs offline. `rover_field_boot` is the Jetson boot loader that reads a survey from a removable card or local disk and dispatches the matching drive mode. `rover_onboard` is the platform layer on the Jetson that runs the OLED display, audio callouts, vision pipeline, and the operator web UI that serves live video plus a real-time rover-state panel.
+The drive software lives under `Software/` and is split into seven Python packages. `rover_sim` includes kinematic vehicle models, a GNSS sensor simulator, safety interlocks, and survey file handling. `rover_drive` defines the drive modes, and path-following controllers. `rover_hardware` is the CAN bridge that carries CommandBus output to the MTT ECU. `rover_sim_emulator` ties the sim modules together in a batch test harness with telemetry logging. `rover_sim_startup` is a small FastAPI app for authoring surveys and viewing logs offline. `rover_field_boot` is the Jetson boot loader that reads a survey from a removable card or local disk and dispatches the matching drive mode. `rover_onboard` is the platform layer on the Jetson that runs the OLED display, audio callouts, vision pipeline, and the operator web UI that serves live video plus a real-time rover-state panel.
 
 See [Software/README.md](Software/README.md) for details on the control architecture.
 
